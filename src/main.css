@@ -1,0 +1,30 @@
+.main-page {
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.top-bar {
+  background-color: #333;
+  color: white;
+  padding: 1rem;
+}
+
+.top-bar nav ul {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.top-bar nav ul li {
+  margin: 0 15px;
+  cursor: pointer;
+}
+
+.top-bar nav ul li:hover {
+  text-decoration: underline; /* Add hover effect */
+}
+
+main {
+  margin-top: 2rem;
+}
