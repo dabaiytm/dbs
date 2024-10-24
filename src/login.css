@@ -1,0 +1,61 @@
+@import url("https://fonts.googleapis.com/css2?family=Raleway+Dots&display=swap");
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+#title {
+  font-family: "Raleway Dots", cursive;
+  font-size: 5rem; /* Increased font size */
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+label {
+  font-size: 1.3rem; /* Larger font for labels */
+  color: white;
+  margin-right: 10px;
+}
+
+input {
+  font-size: 1rem; /* Larger font for inputs */
+  padding: 1rem; /* Increased padding for inputs */
+  border-radius: 8px;
+  border: 2px solid white;
+  background-color: #333;
+  color: white;
+  width: 100%; /* Make the input fields wider */
+  max-width: 300px; /* Limit the maximum width */
+  margin: 0 auto; /* Center inputs */
+}
+
+button {
+  font-size: 1.2rem; /* Larger font for button */
+  padding: 1rem 2rem; /* Larger button padding */
+  border-radius: 8px;
+  /* background-color: #ffdd57; */
+  border: 1px solid transparent;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  max-width: 200px; /* Limit the button width */
+  margin: 0 auto;
+}
+
+button:hover {
+  border-color: #ffdd57;
+}
+
+.error {
+  color: red;
+  font-size: 1.5rem; /* Make error messages larger */
+}
