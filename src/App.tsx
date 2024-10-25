@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import LoginPage from "./LoginPage"; // Adjust the path as needed
-import MainPage from "./MainPage"; // Adjust if you have a MainPage component
+import LoginPage from "./LoginPage"; 
+import MainPage from "./MainPage"; 
 
 const App: React.FC = () => {
   return (
