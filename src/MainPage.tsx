@@ -21,7 +21,7 @@ const MainPage: React.FC = () => {
     <div>
       <header>
         <nav className="navbar">
-          <button onClick={() => navigate("/members")}>Members</button>
+          <button onClick={() => navigate("/Members")}>Members</button>
           <button onClick={() => navigate("/staffs")}>Staffs</button>
           <button onClick={() => navigate("/equipment")}>Equipment</button>
           <button onClick={() => navigate("/classes")}>Classes</button>

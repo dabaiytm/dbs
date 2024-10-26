@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import "./login.css";
 
 const LoginPage: React.FC = () => {
@@ -6,6 +7,7 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); // Initialize the navigate function
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +29,8 @@ const LoginPage: React.FC = () => {
         body: JSON.stringify({ username, password }),
       });
 
+      console.log(response);
+
       const data = await response.json();
       setLoading(false);
 
@@ -35,11 +39,12 @@ const LoginPage: React.FC = () => {
         return;
       }
 
-      // Store the token in localStorage (or cookies)
+      console.log("ahhhh");
+      // Store the token in localStorage
       localStorage.setItem("token", data.token);
 
-      // Redirect to main page
-      window.location.href = "/MainPage";
+      // Redirect to the main page using React Router
+      navigate("/main"); // Use navigate instead of window.location.href
     } catch {
       setLoading(false);
       setError("Failed to connect to server");

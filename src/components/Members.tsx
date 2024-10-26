@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 interface Member {
   MemID: number;
@@ -20,11 +21,25 @@ interface Member {
 const Members: React.FC = () => {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
+  const [memberData, setMemberData] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get("http://localhost:5001/api/users");
+        setMemberData(JSON.stringify(response.data)); // Set users from the response data
+      } catch (err) {
+        console.error(err); // Log error for debugging
+      }
+    };
+
+    fetchUsers(); // Call the function to fetch users
+  }, []);
 
   const fetchMembers = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/members");
+      const response = await fetch("http://localhost:5001/api/members");
       const data = await response.json();
       setMembers(data);
     } catch (error) {
@@ -118,6 +133,7 @@ const Members: React.FC = () => {
             </tbody>
           </table>
         )}
+        <div>{memberData}</div>
       </main>
     </div>
   );
