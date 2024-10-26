@@ -59,3 +59,12 @@ button:hover {
   color: red;
   font-size: 1.5rem; /* Make error messages larger */
 }
+
+.navbar {
+  font-family: "Marker Felt", fantasy, sans-serif;
+  display: flex; /* Use flexbox for layout */
+  justify-content: space-between; /* Space out buttons evenly */
+  align-items: center; /* Center items vertically */
+  margin-top: -400px;
+  padding: 10px 20px;
+}

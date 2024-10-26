@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import "./login.css";
 
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
@@ -19,8 +20,7 @@ const MainPage: React.FC = () => {
   return (
     <div>
       <header>
-        <h1>Welcome to the Main Page</h1>
-        <nav>
+        <nav className="navbar">
           <button onClick={() => navigate("/members")}>Members</button>
           <button onClick={() => navigate("/staffs")}>Staffs</button>
           <button onClick={() => navigate("/equipment")}>Equipment</button>

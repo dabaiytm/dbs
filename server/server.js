@@ -11,19 +11,10 @@ app.use(cors());
 
 // Google Cloud SQL Connection Pool
 const pool = mysql.createPool({
-  host: '34.139.116.78',  
-  user: 'dbsteam1',
-  password: '20241231DBS',
-  database: 'gym_management',
-});
-
-//testing if the connection is good: 
-pool.query('SELECT 1 + 1 AS solution', (err, results) => {
-  if (err) {
-    console.error('Error connecting to the database:', err);
-  } else {
-    console.log('Database connected! The solution is:', results[0].solution);
-  }
+  host: 'your-google-cloud-sql-public-ip',  // Or use the Cloud SQL Proxy for secure connection
+  user: 'your-db-username',
+  password: 'your-db-password',
+  database: 'your-database-name',
 });
 
 // Example function to query the database

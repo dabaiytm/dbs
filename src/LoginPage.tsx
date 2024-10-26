@@ -19,7 +19,7 @@ const LoginPage: React.FC = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5000/api/login", {
+      const response = await fetch("http://localhost:5001/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,8 +39,8 @@ const LoginPage: React.FC = () => {
       localStorage.setItem("token", data.token);
 
       // Redirect to main page
-      window.location.href = "/main";
-    } catch (err) {
+      window.location.href = "/MainPage";
+    } catch {
       setLoading(false);
       setError("Failed to connect to server");
     }
@@ -49,7 +49,7 @@ const LoginPage: React.FC = () => {
   return (
     <div className="App">
       <header className="App-header">
-        <h1 id="title">Login</h1>
+        <h1 id="title">Gym User Login</h1>
         <form onSubmit={handleLogin} className="login-form">
           {error && <p className="error">{error}</p>}
           <div>

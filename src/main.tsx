@@ -1,10 +1,15 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
-import LoginPage from "./LoginPage"; // Import the login page component
+import { BrowserRouter } from "react-router-dom"; // Import BrowserRouter
+import "./index.css"; // Import global styles
+import App from "./App"; // Import App component
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <LoginPage /> {/* Render the login page */}
+    <BrowserRouter>
+      {" "}
+      {/* Wrap App in BrowserRouter for routing */}
+      <App />
+    </BrowserRouter>
   </StrictMode>
 );
