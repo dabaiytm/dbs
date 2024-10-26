@@ -10,10 +10,20 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const pool = mysql.createPool({
-  host: '34.139.116.78',
-  user: 'dbsteam1',
-  password: '20241231DBS',
+  host: 'localhost',
+  user: 'root',
+  password: 'yaotianming',
   database: 'gym_management',
+  port:3306,
+});
+
+pool.getConnection((err, connection) => {
+  if (err) {
+    console.error('Error connecting to the database:', err);
+    return;
+  }
+  console.log('Connected to the local MySQL database');
+  connection.release(); // Release the connection after the check
 });
 
 // Define root route
