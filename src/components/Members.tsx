@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import AddMemberForm from "./AddMemberForm";
 
 interface Member {
-  MemID: number;
-  FName: string;
-  LName: string;
+  MemID: string;
+  Fname: string;
+  Lname: string;
   DOB: string;
   Email: string;
   Addr: string;
   Cell: string;
-  MemId: string;
   JoinDate: string;
   Status: string;
   ERcontact: string;
@@ -21,48 +21,78 @@ interface Member {
 const Members: React.FC = () => {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
-  const [memberData, setMemberData] = useState("");
+  const [showForm, setShowForm] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<Member | undefined>(
+    undefined
+  ); // Change here
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchMembers = async () => {
       try {
-        const response = await axios.get("http://localhost:5001/api/users");
-        setMemberData(JSON.stringify(response.data)); // Set users from the response data
-      } catch (err) {
-        console.error(err); // Log error for debugging
+        const response = await axios.get("http://localhost:5001/api/members");
+        setMembers(response.data);
+      } catch (error) {
+        console.error("Error fetching members:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchUsers(); // Call the function to fetch users
-  }, []);
-
-  const fetchMembers = async () => {
-    try {
-      const response = await fetch("http://localhost:5001/api/members");
-      const data = await response.json();
-      setMembers(data);
-    } catch (error) {
-      console.error("Error fetching members:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
     fetchMembers();
   }, []);
 
-  const handleLogout = () => {
-    navigate("/");
+  const handleAddMember = () => {
+    setSelectedMember(undefined); // Reset selected member for new addition
+    setShowForm(true);
   };
 
-  const handleExit = () => {
-    const confirmExit = window.confirm("Are you sure you want to exit?");
-    if (confirmExit) {
-      window.close();
+  const handleEditMember = (member: Member) => {
+    setSelectedMember(member); // Load member data into form for editing
+    setShowForm(true);
+  };
+
+  const handleSave = async (member: Member) => {
+    try {
+      if (selectedMember) {
+        // Update existing member
+        await axios.put(
+          `http://localhost:5001/api/members/${member.MemID}`,
+          member
+        );
+        setMembers((prevMembers) =>
+          prevMembers.map((m) => (m.MemID === member.MemID ? member : m))
+        );
+      } else {
+        // Add new member
+        await axios.post("http://localhost:5001/api/members", member);
+        setMembers((prevMembers) => [...prevMembers, member]);
+      }
+      alert("Member saved successfully!");
+      setShowForm(false);
+    } catch (error) {
+      console.error("Error saving member:", error);
+      alert("Failed to save member.");
     }
   };
+
+  const handleDeleteMember = async (memID: string) => {
+    if (window.confirm("Are you sure you want to delete this member?")) {
+      try {
+        await axios.delete(`http://localhost:5001/api/members/${memID}`);
+        setMembers((prevMembers) =>
+          prevMembers.filter((m) => m.MemID !== memID)
+        );
+        alert("Member deleted successfully!");
+        setShowForm(false);
+      } catch (error) {
+        console.error("Error deleting member:", error);
+        alert("Failed to delete member.");
+      }
+    }
+  };
+
+  const handleCancel = () => setShowForm(false);
 
   return (
     <div>
@@ -76,12 +106,35 @@ const Members: React.FC = () => {
             Retail Sales
           </button>
           <button onClick={() => navigate("/trainers")}>Trainers</button>
-          <button onClick={handleLogout}>Log Out</button>
-          <button onClick={handleExit}>Exit</button>
+          <button onClick={() => navigate("/")}>Log Out</button>
+          <button
+            onClick={() =>
+              window.confirm("Are you sure you want to exit?") && window.close()
+            }
+          >
+            Exit
+          </button>
         </nav>
       </header>
       <main>
         <h1>Members List</h1>
+        <button onClick={handleAddMember}>Add Member</button>
+
+        {showForm && (
+          <div className="modal">
+            <AddMemberForm
+              member={selectedMember} // Now it can be undefined
+              onSave={handleSave}
+              onCancel={handleCancel}
+              onDelete={
+                selectedMember
+                  ? () => handleDeleteMember(selectedMember.MemID)
+                  : undefined
+              }
+            />
+          </div>
+        )}
+
         {loading ? (
           <p>Loading members...</p>
         ) : (
@@ -95,36 +148,31 @@ const Members: React.FC = () => {
                 <th>Email</th>
                 <th>Address</th>
                 <th>Cell</th>
-                <th>Member ID</th>
                 <th>Join Date</th>
                 <th>Status</th>
                 <th>Emergency Contact</th>
                 <th>Fitness Goal</th>
                 <th>Locker ID</th>
-                <th>Actions</th> {/* New column for actions */}
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {members.map((member) => (
                 <tr key={member.MemID}>
                   <td>{member.MemID}</td>
-                  <td>{member.FName}</td>
-                  <td>{member.LName}</td>
+                  <td>{member.Fname}</td>
+                  <td>{member.Lname}</td>
                   <td>{member.DOB}</td>
                   <td>{member.Email}</td>
                   <td>{member.Addr}</td>
                   <td>{member.Cell}</td>
-                  <td>{member.MemId}</td>
                   <td>{member.JoinDate}</td>
                   <td>{member.Status}</td>
                   <td>{member.ERcontact}</td>
                   <td>{member.FitnessGoal}</td>
                   <td>{member.LockerID}</td>
                   <td>
-                    {/* Link to Member Detail page */}
-                    <button
-                      onClick={() => navigate(`/members/${member.MemID}`)}
-                    >
+                    <button onClick={() => handleEditMember(member)}>
                       View
                     </button>
                   </td>
@@ -133,7 +181,6 @@ const Members: React.FC = () => {
             </tbody>
           </table>
         )}
-        <div>{memberData}</div>
       </main>
     </div>
   );

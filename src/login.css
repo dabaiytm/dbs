@@ -62,9 +62,14 @@ button:hover {
 
 .navbar {
   font-family: "Marker Felt", fantasy, sans-serif;
-  display: flex; /* Use flexbox for layout */
-  justify-content: space-between; /* Space out buttons evenly */
-  align-items: center; /* Center items vertically */
-  margin-top: -400px;
+  position: fixed; /* Fix the navbar at the top */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000; /* Make sure it's above other content */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333; /* Optional: Give the navbar a background color */
   padding: 10px 20px;
 }

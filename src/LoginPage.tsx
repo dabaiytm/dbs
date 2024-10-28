@@ -39,7 +39,6 @@ const LoginPage: React.FC = () => {
         return;
       }
 
-      console.log("ahhhh");
       // Store the token in localStorage
       localStorage.setItem("token", data.token);
 
