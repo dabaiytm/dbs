@@ -26,18 +26,29 @@ app.use(cors({
 
 
 // User Registration Endpoint
+// User Registration Endpoint
 app.post("/api/register", (req, res) => {
   const { username, password } = req.body;
 
-  // Hash the password
-  const hashedPassword = bcrypt.hashSync(password, 8);
+  // Check if the username or password is missing
+  if (!username || !password) {
+    return res.status(400).json({ error: "Username and password are required" });
+  }
 
-  // Insert new user into the database
-  pool.query('INSERT INTO User (Username, PasswordHash) VALUES (?, ?)', [username, hashedPassword], (err) => {
-    if (err) return res.status(500).json({ error: "Database error" });
-    return res.status(201).json({ message: "User registered successfully!" });
-  });
+  // Insert the plain password into the database
+  pool.query(
+    'INSERT INTO User (Username, PasswordHash) VALUES (?, ?)', 
+    [username, password],  // Store the plain password
+    (err) => {
+      if (err) {
+        console.error("Database error during registration:", err);
+        return res.status(500).json({ error: "Database error" });
+      }
+      return res.status(201).json({ message: "User registered successfully!" });
+    }
+  );
 });
+
 
 
 
@@ -135,24 +146,26 @@ app.post("/api/login", (req, res) => {
   const { username, password } = req.body;
 
   getUserByUsername(username, (err, user) => {
-  
-    if (err) return res.status(500).json({ error: "Database error" });
-    if (!user) return res.status(401).json({ error: "Invalid username or password" });
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
 
-
-    const isPasswordValid = bcrypt.compareSync(password, user.PasswordHash);
-    console.log(password)
- 
-
-    if (!isPasswordValid) {
+    // Check if user exists
+    if (!user) {
       return res.status(401).json({ error: "Invalid username or password" });
     }
 
-    const token = jwt.sign({ username: user.username }, SECRET_KEY, { expiresIn: "1h" });
+    // Direct string comparison
+    if (password !== user.PasswordHash) {
+      return res.status(401).json({ error: "Invalid username or password" });
+    }
+
+    // Generate a JWT token if the password matches
+    const token = jwt.sign({ username: user.Username }, SECRET_KEY, { expiresIn: "1h" });
     return res.json({ token });
   });
 });
-
 
 
 
