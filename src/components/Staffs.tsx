@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import AddStaffForm from "./AddStaffForm";
+import "../index.css";
 
 interface Staff {
   StaffID: string;
@@ -11,75 +13,84 @@ interface Staff {
   ContactInfo: string;
 }
 
-const Staff: React.FC = () => {
+const Staffs: React.FC = () => {
+  const [staffs, setStaffs] = useState<Staff[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState<Staff | undefined>(
+    undefined
+  );
   const navigate = useNavigate();
-  const [staffList, setStaffList] = useState<Staff[]>([]);
-  const [form, setForm] = useState<Staff>({
-    StaffID: "",
-    Fname: "",
-    Lname: "",
-    Role: "",
-    Schedule: "",
-    ContactInfo: "",
-  });
-
-  const handleLogout = () => {
-    console.log("Logged out");
-  };
-
-  const handleExit = () => {
-    console.log("Exit");
-  };
 
   useEffect(() => {
-    fetchStaff();
+    const fetchStaffs = async () => {
+      try {
+        const response = await axios.get("http://localhost:5001/api/staffs");
+        setStaffs(response.data);
+      } catch (error) {
+        console.error("Error fetching staffs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStaffs();
   }, []);
 
-  const fetchStaff = () => {
-    axios
-      .get("/api/staff")
-      .then((response) => setStaffList(response.data))
-      .catch((error) => console.error("Error fetching staff:", error));
+  const handleAddStaff = () => {
+    setSelectedStaff(undefined);
+    setShowForm(true);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleEditStaff = (staff: Staff) => {
+    setSelectedStaff(staff);
+    setShowForm(true);
   };
 
-  const createStaff = () => {
-    axios
-      .post("/api/staff", form)
-      .then(() => {
-        fetchStaff();
-        setForm({
-          StaffID: "",
-          Fname: "",
-          Lname: "",
-          Role: "",
-          Schedule: "",
-          ContactInfo: "",
-        });
-      })
-      .catch((error) => console.error("Error creating staff:", error));
+  const handleSave = async (staff: Staff) => {
+    try {
+      if (selectedStaff) {
+        // Update existing member
+        await axios.put(
+          `http://localhost:5001/api/staffs/${staff.StaffID}`,
+          staff
+        );
+        setStaffs((prevStaffs) =>
+          prevStaffs.map((m) => (m.StaffID === staff.StaffID ? staff : m))
+        );
+      } else {
+        // Add new member
+        await axios.post("http://localhost:5001/api/staffs", staff);
+        setStaffs((prevStaffs) => [...prevStaffs, staff]);
+      }
+      alert("Member saved successfully!");
+      setShowForm(false);
+    } catch (error) {
+      console.error("Error saving member:", error);
+      alert("Failed to save staff.");
+    }
   };
 
-  const updateStaff = (StaffID: string) => {
-    axios
-      .put(`/api/staff/${StaffID}`, form)
-      .then(() => fetchStaff())
-      .catch((error) => console.error("Error updating staff:", error));
+  const handleDeleteStaff = async (staffID: string) => {
+    if (window.confirm("Are you sure you want to delete this member?")) {
+      try {
+        await axios.delete(`http://localhost:5001/api/staffs/${staffID}`);
+        setStaffs((prevStaffs) =>
+          prevStaffs.filter((m) => m.StaffID !== staffID)
+        );
+        alert("Member deleted successfully!");
+        setShowForm(false);
+      } catch (error) {
+        console.error("Error deleting staff:", error);
+        alert("Failed to delete staff.");
+      }
+    }
   };
 
-  const deleteStaff = (StaffID: string) => {
-    axios
-      .delete(`/api/staff/${StaffID}`)
-      .then(() => fetchStaff())
-      .catch((error) => console.error("Error deleting staff:", error));
-  };
+  const handleCancel = () => setShowForm(false);
 
   return (
     <div>
-      {/* Header with navigation */}
       <header>
         <nav className="navbar">
           <button onClick={() => navigate("/members")}>Members</button>
@@ -90,96 +101,73 @@ const Staff: React.FC = () => {
             Retail Sales
           </button>
           <button onClick={() => navigate("/trainers")}>Trainers</button>
-          <button onClick={handleLogout}>Log Out</button>
-          <button onClick={handleExit}>Exit</button>
+          <button onClick={() => navigate("/")}>Log Out</button>
+          <button
+            onClick={() =>
+              window.confirm("Are you sure you want to exit?") && window.close()
+            }
+          >
+            Exit
+          </button>
         </nav>
       </header>
 
-      <h1>Staff</h1>
-      <div>
-        <h2>{form.StaffID ? "Update Staff" : "Add New Staff"}</h2>
-        <input
-          type="text"
-          name="StaffID"
-          value={form.StaffID}
-          onChange={handleInputChange}
-          placeholder="Staff ID"
-        />
-        <input
-          type="text"
-          name="Fname"
-          value={form.Fname}
-          onChange={handleInputChange}
-          placeholder="First Name"
-        />
-        <input
-          type="text"
-          name="Lname"
-          value={form.Lname}
-          onChange={handleInputChange}
-          placeholder="Last Name"
-        />
-        <input
-          type="text"
-          name="Role"
-          value={form.Role}
-          onChange={handleInputChange}
-          placeholder="Role"
-        />
-        <input
-          type="text"
-          name="Schedule"
-          value={form.Schedule}
-          onChange={handleInputChange}
-          placeholder="Schedule"
-        />
-        <input
-          type="text"
-          name="ContactInfo"
-          value={form.ContactInfo}
-          onChange={handleInputChange}
-          placeholder="Contact Info"
-        />
-        <button
-          onClick={form.StaffID ? () => updateStaff(form.StaffID) : createStaff}
-        >
-          {form.StaffID ? "Update Staff" : "Add Staff"}
-        </button>
-      </div>
+      <main>
+        <h1>Staff List</h1>
+        <button onClick={handleAddStaff}>Add Staff</button>
+        <br></br>
+        <br></br>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Staff ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Role</th>
-            <th>Schedule</th>
-            <th>Contact Info</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {staffList.map((staff) => (
-            <tr key={staff.StaffID}>
-              <td>{staff.StaffID}</td>
-              <td>{staff.Fname}</td>
-              <td>{staff.Lname}</td>
-              <td>{staff.Role}</td>
-              <td>{staff.Schedule}</td>
-              <td>{staff.ContactInfo}</td>
-              <td>
-                <button onClick={() => setForm(staff)}>Edit</button>
-                <button onClick={() => deleteStaff(staff.StaffID)}>
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        {showForm && (
+          <div className="modal">
+            <AddStaffForm
+              staff={selectedStaff} // Now it can be undefined
+              onSave={handleSave}
+              onCancel={handleCancel}
+              onDelete={
+                selectedStaff
+                  ? () => handleDeleteStaff(selectedStaff.StaffID)
+                  : undefined
+              }
+            />
+          </div>
+        )}
+
+        {loading ? (
+          <p>Loading staff...</p>
+        ) : (
+          <table id="staff_table">
+            <thead>
+              <tr>
+                <th>StaffID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Role</th>
+                <th>Schedule</th>
+                <th>Contact Info</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {staffs.map((staff) => (
+                <tr key={staff.StaffID}>
+                  <td>{staff.StaffID}</td>
+                  <td>{staff.Fname}</td>
+                  <td>{staff.Lname}</td>
+                  <td>{staff.Role}</td>
+                  <td>{staff.Schedule}</td>
+                  <td>{staff.ContactInfo}</td>
+                  <td>
+                    <button onClick={() => handleEditStaff(staff)}>View</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </main>
     </div>
   );
 };
 
-export default Staff;
+export default Staffs;

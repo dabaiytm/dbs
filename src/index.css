@@ -66,3 +66,41 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+#staff_table {
+  margin: 0 auto;
+}
+
+table,
+th,
+td {
+  border: 1px solid grey; /* Adds a black border to the table, headers, and cells */
+}
+
+th,
+td {
+  padding: 5px; /* Adds padding inside the cells */
+  text-align: center; /* Aligns text to the left */
+}
+
+th {
+  font-size: large;
+}
+
+footer {
+  margin-bottom: 0px;
+  position: fixed;
+  text-align: center;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+#greeting {
+  font-size: 64px;
+  font-family: "Luminari", fantasy;
+}
+
+h1 {
+  font-family: Bradley Hand, cursive;
+}

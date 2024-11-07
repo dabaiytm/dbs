@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AddMemberForm from "./AddMemberForm";
+import "../index.css";
 
 interface Member {
   MemID: string;
@@ -116,9 +117,12 @@ const Members: React.FC = () => {
           </button>
         </nav>
       </header>
+
       <main>
         <h1>Members List</h1>
         <button onClick={handleAddMember}>Add Member</button>
+        <br></br>
+        <br></br>
 
         {showForm && (
           <div className="modal">

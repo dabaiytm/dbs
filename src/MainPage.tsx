@@ -34,6 +34,7 @@ const MainPage: React.FC = () => {
         </nav>
       </header>
       <main>{/* Content for the main page goes here */}</main>
+      <p id="greeting">Welcome To The Gym Database !</p>
     </div>
   );
 };

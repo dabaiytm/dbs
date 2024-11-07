@@ -222,3 +222,77 @@ app.get('/', (req, res) => {
 app.listen(5001, () => {
   console.log("Server is running on http://localhost:5001");
 });
+
+//staff
+// Add a new staff (trainer)
+app.post("/api/staffs", (req, res) => {
+  const { StaffID, Fname, Lname, Role, Schedule, ContactInfo } = req.body;
+
+  pool.query(
+    "INSERT INTO Staffs (StaffID, Fname, Lname, Role, Schedule, ContactInfo) VALUES (?, ?, ?, ?, ?, ?)",
+    [StaffID, Fname, Lname, Role, Schedule, ContactInfo],
+    (err) => {
+      if (err) {
+        console.error("Error adding staff:", err);
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.status(201).json({ message: "Staff added successfully!" });
+    }
+  );
+});
+
+// Get all staff members
+app.get("/api/staffs", (req, res) => {
+  pool.query('SELECT * FROM Staffs', (err, results) => {
+    if (err) {
+      console.error('Error fetching staff:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(results); // Send back the results as JSON
+  });
+});
+
+// Get a specific staff member by StaffID
+app.get("/api/staffs/:id", (req, res) => {
+  const { id } = req.params;
+  pool.query("SELECT * FROM Staffs WHERE StaffID = ?", [id], (err, results) => {
+    if (err) {
+      console.error("Error fetching staff:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ error: "Staff not found" });
+    }
+    res.json(results[0]);
+  });
+});
+
+// Update a staff member's details
+app.put("/api/staffs/:id", (req, res) => {
+  const { id } = req.params;
+  const { Fname, Lname, Role, Schedule, ContactInfo } = req.body;
+
+  pool.query(
+    "UPDATE Staffs SET Fname = ?, Lname = ?, Role = ?, Schedule = ?, ContactInfo = ? WHERE StaffID = ?",
+    [Fname, Lname, Role, Schedule, ContactInfo, id],
+    (err) => {
+      if (err) {
+        console.error("Error updating staff:", err);
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json({ message: "Staff updated successfully!" });
+    }
+  );
+});
+
+// Delete a staff member
+app.delete("/api/staffs/:id", (req, res) => {
+  const { id } = req.params;
+  pool.query("DELETE FROM Staffs WHERE StaffID = ?", [id], (err) => {
+    if (err) {
+      console.error("Error deleting staff:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+    res.json({ message: "Staff deleted successfully!" });
+  });
+});

@@ -1,14 +1,21 @@
 import LoginPage from "./LoginPage"; // Adjust the import path as needed
-import MainPage from "./MainPage"; // Ensure MainPage is imported correctly
+import MainPage from "./MainPage";
 import Members from "./components/Members";
+import Staffs from "./components/Staffs";
+import Footer from "./components/Footer";
 import { Routes, Route } from "react-router-dom";
+
 const App = () => {
   return (
-    <Routes>
-      <Route path="/" element={<LoginPage />} />
-      <Route path="/main" element={<MainPage />} />
-      <Route path="/members" element={<Members />} />
-    </Routes>
+    <div>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/main" element={<MainPage />} />
+        <Route path="/members" element={<Members />} />
+        <Route path="/staffs" element={<Staffs />} />
+      </Routes>
+      <Footer /> {/* Footer will be displayed on all pages */}
+    </div>
   );
 };
 
