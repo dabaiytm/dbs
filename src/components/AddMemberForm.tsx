@@ -6,13 +6,20 @@ interface Member {
   Lname: string;
   DOB: string;
   Email: string;
-  Addr: string;
   Cell: string;
   JoinDate: string;
   Status: string;
-  ERcontact: string;
   FitnessGoal: string;
   LockerID: string;
+  GymID: string;
+  MembershipID: string;
+  TrainerSSN: string;
+  Street: string;
+  City: string;
+  State: string;
+  Zipcode: string;
+  ERContactName: string;
+  ERContactPhone: string;
 }
 
 interface AddMemberFormProps {
@@ -34,33 +41,46 @@ const AddMemberForm: React.FC<AddMemberFormProps> = ({
     Lname: "",
     DOB: "",
     Email: "",
-    Addr: "",
     Cell: "",
     JoinDate: "",
     Status: "",
-    ERcontact: "",
     FitnessGoal: "",
     LockerID: "",
+    GymID: "",
+    MembershipID: "",
+    TrainerSSN: "",
+    Street: "",
+    City: "",
+    State: "",
+    Zipcode: "",
+    ERContactName: "",
+    ERContactPhone: "",
   });
 
   useEffect(() => {
     if (member) {
       setFormData(member); // Load member data into the form if member exists
     } else {
-      // Reset the form data for adding a new member
       setFormData({
         MemID: "",
         Fname: "",
         Lname: "",
         DOB: "",
         Email: "",
-        Addr: "",
         Cell: "",
         JoinDate: "",
         Status: "",
-        ERcontact: "",
         FitnessGoal: "",
         LockerID: "",
+        GymID: "",
+        MembershipID: "",
+        TrainerSSN: "",
+        Street: "",
+        City: "",
+        State: "",
+        Zipcode: "",
+        ERContactName: "",
+        ERContactPhone: "",
       });
     }
   }, [member]);
@@ -78,7 +98,6 @@ const AddMemberForm: React.FC<AddMemberFormProps> = ({
   return (
     <form onSubmit={handleSubmit}>
       <h2>{member ? "Edit Member" : "Add New Member"}</h2>
-
       <input
         type="text"
         name="MemID"
@@ -118,13 +137,6 @@ const AddMemberForm: React.FC<AddMemberFormProps> = ({
         placeholder="Email"
       />
       <input
-        type="text"
-        name="Addr"
-        value={formData.Addr}
-        onChange={handleChange}
-        placeholder="Address"
-      />
-      <input
         type="tel"
         name="Cell"
         value={formData.Cell}
@@ -147,13 +159,6 @@ const AddMemberForm: React.FC<AddMemberFormProps> = ({
       />
       <input
         type="text"
-        name="ERcontact"
-        value={formData.ERcontact}
-        onChange={handleChange}
-        placeholder="Emergency Contact"
-      />
-      <input
-        type="text"
         name="FitnessGoal"
         value={formData.FitnessGoal}
         onChange={handleChange}
@@ -166,8 +171,70 @@ const AddMemberForm: React.FC<AddMemberFormProps> = ({
         onChange={handleChange}
         placeholder="Locker ID"
       />
-      <br></br>
-
+      <input
+        type="text"
+        name="GymID"
+        value={formData.GymID}
+        onChange={handleChange}
+        placeholder="Gym ID"
+      />
+      <input
+        type="text"
+        name="MembershipID"
+        value={formData.MembershipID}
+        onChange={handleChange}
+        placeholder="Membership ID"
+      />
+      <input
+        type="text"
+        name="TrainerSSN"
+        value={formData.TrainerSSN}
+        onChange={handleChange}
+        placeholder="Trainer SSN"
+      />
+      <input
+        type="text"
+        name="Street"
+        value={formData.Street}
+        onChange={handleChange}
+        placeholder="Street"
+      />
+      <input
+        type="text"
+        name="City"
+        value={formData.City}
+        onChange={handleChange}
+        placeholder="City"
+      />
+      <input
+        type="text"
+        name="State"
+        value={formData.State}
+        onChange={handleChange}
+        placeholder="State"
+      />
+      <input
+        type="text"
+        name="Zipcode"
+        value={formData.Zipcode}
+        onChange={handleChange}
+        placeholder="Zipcode"
+      />
+      <input
+        type="text"
+        name="ERContactName"
+        value={formData.ERContactName}
+        onChange={handleChange}
+        placeholder="Emergency Contact Name"
+      />
+      <input
+        type="tel"
+        name="ERContactPhone"
+        value={formData.ERContactPhone}
+        onChange={handleChange}
+        placeholder="Emergency Contact Phone"
+      />
+      <br />
       <button type="submit">Save</button>
       <button type="button" onClick={onCancel}>
         Cancel

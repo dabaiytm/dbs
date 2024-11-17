@@ -5,21 +5,22 @@ import AddStaffForm from "./AddStaffForm";
 import "../index.css";
 
 interface Staff {
-  StaffID: string;
+  StaffSSN: string;
   Fname: string;
   Lname: string;
-  Role: string;
-  Schedule: string;
   ContactInfo: string;
+  GymID: string;
 }
 
 const Staffs: React.FC = () => {
   const [staffs, setStaffs] = useState<Staff[]>([]);
+  const [filteredStaffs, setFilteredStaffs] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<Staff | undefined>(
     undefined
   );
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,6 +28,7 @@ const Staffs: React.FC = () => {
       try {
         const response = await axios.get("http://localhost:5001/api/staffs");
         setStaffs(response.data);
+        setFilteredStaffs(response.data);
       } catch (error) {
         console.error("Error fetching staffs:", error);
       } finally {
@@ -36,6 +38,20 @@ const Staffs: React.FC = () => {
 
     fetchStaffs();
   }, []);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const query = event.target.value.toLowerCase();
+    setSearchQuery(query);
+    setFilteredStaffs(
+      staffs.filter(
+        (staff) =>
+          staff.Fname.toLowerCase().includes(query) ||
+          staff.Lname.toLowerCase().includes(query) ||
+          staff.GymID.toLowerCase().includes(query) ||
+          staff.StaffSSN.toLowerCase().includes(query)
+      )
+    );
+  };
 
   const handleAddStaff = () => {
     setSelectedStaff(undefined);
@@ -50,35 +66,42 @@ const Staffs: React.FC = () => {
   const handleSave = async (staff: Staff) => {
     try {
       if (selectedStaff) {
-        // Update existing member
+        // Update existing staff
         await axios.put(
-          `http://localhost:5001/api/staffs/${staff.StaffID}`,
+          `http://localhost:5001/api/staffs/${staff.StaffSSN}`,
           staff
         );
         setStaffs((prevStaffs) =>
-          prevStaffs.map((m) => (m.StaffID === staff.StaffID ? staff : m))
+          prevStaffs.map((s) => (s.StaffSSN === staff.StaffSSN ? staff : s))
+        );
+        setFilteredStaffs((prevStaffs) =>
+          prevStaffs.map((s) => (s.StaffSSN === staff.StaffSSN ? staff : s))
         );
       } else {
-        // Add new member
+        // Add new staff
         await axios.post("http://localhost:5001/api/staffs", staff);
         setStaffs((prevStaffs) => [...prevStaffs, staff]);
+        setFilteredStaffs((prevStaffs) => [...prevStaffs, staff]);
       }
-      alert("Member saved successfully!");
+      alert("Staff saved successfully!");
       setShowForm(false);
     } catch (error) {
-      console.error("Error saving member:", error);
+      console.error("Error saving staff:", error);
       alert("Failed to save staff.");
     }
   };
 
-  const handleDeleteStaff = async (staffID: string) => {
-    if (window.confirm("Are you sure you want to delete this member?")) {
+  const handleDeleteStaff = async (staffSSN: string) => {
+    if (window.confirm("Are you sure you want to delete this staff member?")) {
       try {
-        await axios.delete(`http://localhost:5001/api/staffs/${staffID}`);
+        await axios.delete(`http://localhost:5001/api/staffs/${staffSSN}`);
         setStaffs((prevStaffs) =>
-          prevStaffs.filter((m) => m.StaffID !== staffID)
+          prevStaffs.filter((s) => s.StaffSSN !== staffSSN)
         );
-        alert("Member deleted successfully!");
+        setFilteredStaffs((prevStaffs) =>
+          prevStaffs.filter((s) => s.StaffSSN !== staffSSN)
+        );
+        alert("Staff deleted successfully!");
         setShowForm(false);
       } catch (error) {
         console.error("Error deleting staff:", error);
@@ -114,19 +137,32 @@ const Staffs: React.FC = () => {
 
       <main>
         <h1>Staff List</h1>
-        <button onClick={handleAddStaff}>Add Staff</button>
-        <br></br>
-        <br></br>
+        <div>
+          {!showForm && ( // Hide the search bar when the form is displayed
+            <input
+              type="text"
+              placeholder="Search StaffSSN, F/Lname"
+              value={searchQuery}
+              onChange={handleSearch}
+              style={{ marginLeft: "10px", padding: "5px" }}
+            />
+          )}
+          <button onClick={handleAddStaff} style={{ marginLeft: "10px" }}>
+            Add Staff
+          </button>
+        </div>
+        <br />
+        <br />
 
         {showForm && (
           <div className="modal">
             <AddStaffForm
-              staff={selectedStaff} // Now it can be undefined
+              staff={selectedStaff} // It can be undefined
               onSave={handleSave}
               onCancel={handleCancel}
               onDelete={
                 selectedStaff
-                  ? () => handleDeleteStaff(selectedStaff.StaffID)
+                  ? () => handleDeleteStaff(selectedStaff.StaffSSN)
                   : undefined
               }
             />
@@ -139,26 +175,24 @@ const Staffs: React.FC = () => {
           <table id="staff_table">
             <thead>
               <tr>
-                <th>StaffID</th>
+                <th>StaffSSN</th>
                 <th>First Name</th>
                 <th>Last Name</th>
-                <th>Role</th>
-                <th>Schedule</th>
                 <th>Contact Info</th>
+                <th>Gym ID</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {staffs.map((staff) => (
-                <tr key={staff.StaffID}>
-                  <td>{staff.StaffID}</td>
+              {filteredStaffs.map((staff) => (
+                <tr key={staff.StaffSSN}>
+                  <td>{staff.StaffSSN}</td>
                   <td>{staff.Fname}</td>
                   <td>{staff.Lname}</td>
-                  <td>{staff.Role}</td>
-                  <td>{staff.Schedule}</td>
                   <td>{staff.ContactInfo}</td>
+                  <td>{staff.GymID}</td>
                   <td>
-                    <button onClick={() => handleEditStaff(staff)}>View</button>
+                    <button onClick={() => handleEditStaff(staff)}>Edit</button>
                   </td>
                 </tr>
               ))}

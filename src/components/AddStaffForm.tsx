@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 
 interface Staff {
-  StaffID: string;
+  StaffSSN: string;
   Fname: string;
   Lname: string;
-  Role: string;
-  Schedule: string;
   ContactInfo: string;
+  GymID: string;
 }
 
 interface AddStaffFormProps {
@@ -23,12 +22,11 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
   onDelete,
 }) => {
   const [formData, setFormData] = useState<Staff>({
-    StaffID: "",
+    StaffSSN: "",
     Fname: "",
     Lname: "",
-    Role: "",
-    Schedule: "",
     ContactInfo: "",
+    GymID: "",
   });
 
   useEffect(() => {
@@ -36,12 +34,11 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
       setFormData(staff);
     } else {
       setFormData({
-        StaffID: "",
+        StaffSSN: "",
         Fname: "",
         Lname: "",
-        Role: "",
-        Schedule: "",
         ContactInfo: "",
+        GymID: "",
       });
     }
   }, [staff]);
@@ -62,10 +59,10 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
 
       <input
         type="text"
-        name="StaffID"
-        value={formData.StaffID}
+        name="StaffSSN"
+        value={formData.StaffSSN}
         onChange={handleChange}
-        placeholder="Staff ID"
+        placeholder="Staff SSN"
         required
       />
       <input
@@ -86,27 +83,20 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
       />
       <input
         type="text"
-        name="Role"
-        value={formData.Role}
-        onChange={handleChange}
-        placeholder="Role"
-      />
-      <input
-        type="text"
-        name="Schedule"
-        value={formData.Schedule}
-        onChange={handleChange}
-        placeholder="Schedule"
-      />
-      <input
-        type="text"
         name="ContactInfo"
         value={formData.ContactInfo}
         onChange={handleChange}
-        placeholder="ContactInfo"
+        placeholder="Contact Info"
+      />
+      <input
+        type="text"
+        name="GymID"
+        value={formData.GymID}
+        onChange={handleChange}
+        placeholder="Gym ID"
       />
 
-      <br></br>
+      <br />
 
       <button type="submit">Save</button>
       <button type="button" onClick={onCancel}>

@@ -1,82 +1,129 @@
+// Equipment.tsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import AddEquipmentForm from "./AddEquipmentForm";
+import "../index.css";
 
 interface Equipment {
   EquipmentID: string;
   EquipmentName: string;
   TargetGroup: string;
   MaintainanceSchedule: string;
-  Condition: string;
+  ConditionStatus: string;
+  GymID: number | null;
 }
 
-const Equipment: React.FC = () => {
-  const navigate = useNavigate();
+const EquipmentPage: React.FC = () => {
   const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
-  const [form, setForm] = useState<Equipment>({
-    EquipmentID: "",
-    EquipmentName: "",
-    TargetGroup: "",
-    MaintainanceSchedule: "",
-    Condition: "",
-  });
+  const [filteredEquipment, setFilteredEquipment] = useState<Equipment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [selectedEquipment, setSelectedEquipment] = useState<
+    Equipment | undefined
+  >(undefined);
 
-  const handleLogout = () => {
-    console.log("Logged out");
-  };
-
-  const handleExit = () => {
-    console.log("Exit");
-  };
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchEquipment = async () => {
+      try {
+        const response = await axios.get("http://localhost:5001/api/equipment");
+        setEquipmentList(response.data);
+        setFilteredEquipment(response.data);
+      } catch (error) {
+        console.error("Error fetching equipment:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchEquipment();
   }, []);
 
-  const fetchEquipment = () => {
-    axios
-      .get("/api/equipment")
-      .then((response) => setEquipmentList(response.data))
-      .catch((error) => console.error("Error fetching equipment:", error));
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const query = event.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    setFilteredEquipment(
+      equipmentList.filter(
+        (equipment) =>
+          equipment.EquipmentID.toLowerCase().includes(query) ||
+          equipment.EquipmentName.toLowerCase().includes(query) ||
+          (equipment.GymID !== null &&
+            equipment.GymID.toString().toLowerCase().includes(query))
+      )
+    );
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleAddEquipment = () => {
+    setSelectedEquipment(undefined);
+    setShowForm(true);
   };
 
-  const createEquipment = () => {
-    axios
-      .post("/api/equipment", form)
-      .then(() => {
-        fetchEquipment();
-        setForm({
-          EquipmentID: "",
-          EquipmentName: "",
-          TargetGroup: "",
-          MaintainanceSchedule: "",
-          Condition: "",
-        });
-      })
-      .catch((error) => console.error("Error creating equipment:", error));
+  const handleEditEquipment = (equipment: Equipment) => {
+    setSelectedEquipment(equipment);
+    setShowForm(true);
   };
 
-  const updateEquipment = (EquipmentID: string) => {
-    axios
-      .put(`/api/equipment/${EquipmentID}`, form)
-      .then(() => fetchEquipment())
-      .catch((error) => console.error("Error updating equipment:", error));
+  const handleSave = async (equipment: Equipment) => {
+    try {
+      if (selectedEquipment) {
+        // Update existing equipment
+        await axios.put(
+          `http://localhost:5001/api/equipment/${equipment.EquipmentID}`,
+          equipment
+        );
+        setEquipmentList((prevEquipment) =>
+          prevEquipment.map((e) =>
+            e.EquipmentID === equipment.EquipmentID ? equipment : e
+          )
+        );
+        setFilteredEquipment((prevEquipment) =>
+          prevEquipment.map((e) =>
+            e.EquipmentID === equipment.EquipmentID ? equipment : e
+          )
+        );
+      } else {
+        // Add new equipment
+        await axios.post("http://localhost:5001/api/equipment", equipment);
+        setEquipmentList((prevEquipment) => [...prevEquipment, equipment]);
+        setFilteredEquipment((prevEquipment) => [...prevEquipment, equipment]);
+      }
+      alert("Equipment saved successfully!");
+      setShowForm(false);
+    } catch (error) {
+      console.error("Error saving equipment:", error);
+      alert("Failed to save equipment.");
+    }
   };
 
-  const deleteEquipment = (EquipmentID: string) => {
-    axios
-      .delete(`/api/equipment/${EquipmentID}`)
-      .then(() => fetchEquipment())
-      .catch((error) => console.error("Error deleting equipment:", error));
+  const handleDeleteEquipment = async (equipmentID: string) => {
+    if (window.confirm("Are you sure you want to delete this equipment?")) {
+      try {
+        await axios.delete(
+          `http://localhost:5001/api/equipment/${equipmentID}`
+        );
+        setEquipmentList((prevEquipment) =>
+          prevEquipment.filter((e) => e.EquipmentID !== equipmentID)
+        );
+        setFilteredEquipment((prevEquipment) =>
+          prevEquipment.filter((e) => e.EquipmentID !== equipmentID)
+        );
+        alert("Equipment deleted successfully!");
+        setShowForm(false);
+      } catch (error) {
+        console.error("Error deleting equipment:", error);
+        alert("Failed to delete equipment.");
+      }
+    }
   };
+
+  const handleCancel = () => setShowForm(false);
 
   return (
     <div>
-      {/* Header with navigation */}
       <header>
         <nav className="navbar">
           <button onClick={() => navigate("/members")}>Members</button>
@@ -87,91 +134,88 @@ const Equipment: React.FC = () => {
             Retail Sales
           </button>
           <button onClick={() => navigate("/trainers")}>Trainers</button>
-          <button onClick={handleLogout}>Log Out</button>
-          <button onClick={handleExit}>Exit</button>
+          <button onClick={() => navigate("/")}>Log Out</button>
+          <button
+            onClick={() =>
+              window.confirm("Are you sure you want to exit?") && window.close()
+            }
+          >
+            Exit
+          </button>
         </nav>
       </header>
 
-      <h1>Equipment</h1>
-      <div>
-        <h2>{form.EquipmentID ? "Update Equipment" : "Add New Equipment"}</h2>
-        <input
-          type="text"
-          name="EquipmentID"
-          value={form.EquipmentID}
-          onChange={handleInputChange}
-          placeholder="Equipment ID"
-        />
-        <input
-          type="text"
-          name="EquipmentName"
-          value={form.EquipmentName}
-          onChange={handleInputChange}
-          placeholder="Equipment Name"
-        />
-        <input
-          type="text"
-          name="TargetGroup"
-          value={form.TargetGroup}
-          onChange={handleInputChange}
-          placeholder="Target Group"
-        />
-        <input
-          type="text"
-          name="MaintainanceSchedule"
-          value={form.MaintainanceSchedule}
-          onChange={handleInputChange}
-          placeholder="Maintenance Schedule"
-        />
-        <input
-          type="text"
-          name="Condition"
-          value={form.Condition}
-          onChange={handleInputChange}
-          placeholder="Condition"
-        />
-        <button
-          onClick={
-            form.EquipmentID
-              ? () => updateEquipment(form.EquipmentID)
-              : createEquipment
-          }
-        >
-          {form.EquipmentID ? "Update Equipment" : "Add Equipment"}
-        </button>
-      </div>
+      <main>
+        <h1>Equipment List</h1>
+        <div>
+          {!showForm && (
+            <input
+              type="text"
+              placeholder="Search EquipmentID, Name, or GymID"
+              value={searchQuery}
+              onChange={handleSearch}
+              style={{ marginLeft: "10px", padding: "5px" }}
+            />
+          )}
+          <button onClick={handleAddEquipment} style={{ marginLeft: "10px" }}>
+            Add Equipment
+          </button>
+        </div>
+        <br />
+        <br />
 
-      <table>
-        <thead>
-          <tr>
-            <th>Equipment ID</th>
-            <th>Equipment Name</th>
-            <th>Target Group</th>
-            <th>Maintenance Schedule</th>
-            <th>Condition</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {equipmentList.map((equipment) => (
-            <tr key={equipment.EquipmentID}>
-              <td>{equipment.EquipmentID}</td>
-              <td>{equipment.EquipmentName}</td>
-              <td>{equipment.TargetGroup}</td>
-              <td>{equipment.MaintainanceSchedule}</td>
-              <td>{equipment.Condition}</td>
-              <td>
-                <button onClick={() => setForm(equipment)}>Edit</button>
-                <button onClick={() => deleteEquipment(equipment.EquipmentID)}>
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        {showForm && (
+          <div className="modal">
+            <AddEquipmentForm
+              equipment={selectedEquipment} // Can be undefined
+              onSave={handleSave}
+              onCancel={handleCancel}
+              onDelete={
+                selectedEquipment
+                  ? () => handleDeleteEquipment(selectedEquipment.EquipmentID)
+                  : undefined
+              }
+            />
+          </div>
+        )}
+
+        {loading ? (
+          <p>Loading equipment...</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>EquipmentID</th>
+                <th>EquipmentName</th>
+                <th>Target Group</th>
+                <th>Maintainance Schedule</th>
+                <th>Condition Status</th>
+                <th>Gym ID</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredEquipment.map((equipment) => (
+                <tr key={equipment.EquipmentID}>
+                  <td>{equipment.EquipmentID}</td>
+                  <td>{equipment.EquipmentName}</td>
+                  <td>{equipment.TargetGroup}</td>
+                  <td>{equipment.MaintainanceSchedule}</td>
+                  <td>{equipment.ConditionStatus}</td>
+                  <td>{equipment.GymID}</td>
+                  <td>
+                    <button onClick={() => handleEditEquipment(equipment)}>
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </main>
     </div>
   );
 };
 
-export default Equipment;
+export default EquipmentPage;

@@ -23,9 +23,6 @@ app.use(cors({
   credentials: false, // Include cookies in requests (if needed)
 }));
 
-
-
-// User Registration Endpoint
 // User Registration Endpoint
 app.post("/api/register", (req, res) => {
   const { username, password } = req.body;
@@ -99,21 +96,28 @@ app.post("/api/members", (req, res) => {
     Lname,
     DOB,
     Email,
-    Addr,
     Cell,
     JoinDate,
     Status,
-    ERcontact,
     FitnessGoal,
     LockerID,
+    GymID,
+    MembershipID,
+    TrainerSSN,
+    Street,
+    City,
+    State,
+    Zipcode,
+    ERContactName,
+    ERContactPhone
   } = req.body;
 
   pool.query(
-    "INSERT INTO Members (MemID, Fname, Lname, DOB, Email, Addr, Cell, JoinDate, Status, ERcontact, FitnessGoal, LockerID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-    [MemID, Fname, Lname, DOB, Email, Addr, Cell, JoinDate, Status, ERcontact, FitnessGoal, LockerID],
+    "INSERT INTO Members (MemID, Fname, Lname, DOB, Email, Cell, JoinDate, Status, FitnessGoal, LockerID, GymID, MembershipID, TrainerSSN, Street, City, State, Zipcode, ERContactName, ERContactPhone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    [MemID, Fname, Lname, DOB, Email, Cell, JoinDate, Status, FitnessGoal, LockerID, GymID, MembershipID, TrainerSSN, Street, City, State, Zipcode, ERContactName, ERContactPhone],
     (err) => {
       if (err) {
-        console.error("Error adding member:", err);
+        console.error("Error adding member:", err.message); 
         return res.status(500).json({ error: "Database error" });
       }
       res.status(201).json({ message: "Member added successfully!" });
@@ -177,18 +181,25 @@ app.put("/api/members/:id", (req, res) => {
     Lname,
     DOB,
     Email,
-    Addr,
     Cell,
     JoinDate,
     Status,
-    ERcontact,
     FitnessGoal,
     LockerID,
+    GymID,
+    MembershipID,
+    TrainerSSN,
+    Street,
+    City,
+    State,
+    Zipcode,
+    ERContactName,
+    ERContactPhone
   } = req.body;
 
   pool.query(
-    "UPDATE Members SET Fname = ?, Lname = ?, DOB = ?, Email = ?, Addr = ?, Cell = ?, JoinDate = ?, Status = ?, ERcontact = ?, FitnessGoal = ?, LockerID = ? WHERE MemID = ?",
-    [Fname, Lname, DOB, Email, Addr, Cell, JoinDate, Status, ERcontact, FitnessGoal, LockerID, id],
+    "UPDATE Members SET Fname = ?, Lname = ?, DOB = ?, Email = ?, Cell = ?, JoinDate = ?, Status = ?, FitnessGoal = ?, LockerID = ?, GymID = ?, MembershipID = ?, TrainerSSN = ?, Street = ?, City = ?, State = ?, Zipcode = ? , ERContactName = ?, ERContactPhone = ? WHERE MemID = ?",
+    [Fname, Lname, DOB, Email, Cell, JoinDate, Status, FitnessGoal, LockerID, GymID, MembershipID, TrainerSSN, Street, City, State, Zipcode, ERContactName, ERContactPhone, id],
     (err) => {
       if (err) {
         console.error("Error updating member:", err);
@@ -223,14 +234,13 @@ app.listen(5001, () => {
   console.log("Server is running on http://localhost:5001");
 });
 
-//staff
 // Add a new staff (trainer)
 app.post("/api/staffs", (req, res) => {
-  const { StaffID, Fname, Lname, Role, Schedule, ContactInfo } = req.body;
+  const { StaffSSN, Fname, Lname, ContactInfo, GymID } = req.body;
 
   pool.query(
-    "INSERT INTO Staffs (StaffID, Fname, Lname, Role, Schedule, ContactInfo) VALUES (?, ?, ?, ?, ?, ?)",
-    [StaffID, Fname, Lname, Role, Schedule, ContactInfo],
+    "INSERT INTO Staffs (StaffSSN, Fname, Lname, ContactInfo, GymID) VALUES (?, ?, ?, ?, ?)",
+    [StaffSSN, Fname, Lname, ContactInfo, GymID],
     (err) => {
       if (err) {
         console.error("Error adding staff:", err);
@@ -243,19 +253,19 @@ app.post("/api/staffs", (req, res) => {
 
 // Get all staff members
 app.get("/api/staffs", (req, res) => {
-  pool.query('SELECT * FROM Staffs', (err, results) => {
+  pool.query("SELECT StaffSSN, Fname, Lname, ContactInfo, GymID FROM Staffs", (err, results) => {
     if (err) {
-      console.error('Error fetching staff:', err);
-      return res.status(500).json({ error: 'Database error' });
+      console.error("Error fetching staff:", err);
+      return res.status(500).json({ error: "Database error" });
     }
     res.json(results); // Send back the results as JSON
   });
 });
 
-// Get a specific staff member by StaffID
-app.get("/api/staffs/:id", (req, res) => {
-  const { id } = req.params;
-  pool.query("SELECT * FROM Staffs WHERE StaffID = ?", [id], (err, results) => {
+// Get a specific staff member by StaffSSN
+app.get("/api/staffs/:ssn", (req, res) => {
+  const { ssn } = req.params;
+  pool.query("SELECT StaffSSN, Fname, Lname, ContactInfo, GymID FROM Staffs WHERE StaffSSN = ?", [ssn], (err, results) => {
     if (err) {
       console.error("Error fetching staff:", err);
       return res.status(500).json({ error: "Database error" });
@@ -268,13 +278,13 @@ app.get("/api/staffs/:id", (req, res) => {
 });
 
 // Update a staff member's details
-app.put("/api/staffs/:id", (req, res) => {
-  const { id } = req.params;
-  const { Fname, Lname, Role, Schedule, ContactInfo } = req.body;
+app.put("/api/staffs/:ssn", (req, res) => {
+  const { ssn } = req.params;
+  const { Fname, Lname, ContactInfo, GymID } = req.body;
 
   pool.query(
-    "UPDATE Staffs SET Fname = ?, Lname = ?, Role = ?, Schedule = ?, ContactInfo = ? WHERE StaffID = ?",
-    [Fname, Lname, Role, Schedule, ContactInfo, id],
+    "UPDATE Staffs SET Fname = ?, Lname = ?, ContactInfo = ?, GymID = ? WHERE StaffSSN = ?",
+    [Fname, Lname, ContactInfo, GymID, ssn],
     (err) => {
       if (err) {
         console.error("Error updating staff:", err);
@@ -286,13 +296,75 @@ app.put("/api/staffs/:id", (req, res) => {
 });
 
 // Delete a staff member
-app.delete("/api/staffs/:id", (req, res) => {
-  const { id } = req.params;
-  pool.query("DELETE FROM Staffs WHERE StaffID = ?", [id], (err) => {
+app.delete("/api/staffs/:ssn", (req, res) => {
+  const { ssn } = req.params;
+  pool.query("DELETE FROM Staffs WHERE StaffSSN = ?", [ssn], (err) => {
     if (err) {
       console.error("Error deleting staff:", err);
       return res.status(500).json({ error: "Database error" });
     }
     res.json({ message: "Staff deleted successfully!" });
+  });
+});
+
+// Get all equipment
+app.get("/api/equipment", (req, res) => {
+  pool.query("SELECT * FROM Equipment", (err, results) => {
+    if (err) {
+      res.status(500).send("Error fetching equipment data");
+      return;
+    }
+    res.json(results);
+  });
+});
+
+// Get equipment by ID
+app.get("/api/equipment/:id", (req, res) => {
+  const { id } = req.params;
+  pool.query("SELECT * FROM Equipment WHERE EquipmentID = ?", [id], (err, results) => {
+    if (err) {
+      res.status(500).send("Error fetching equipment");
+      return;
+    }
+    res.json(results[0]);
+  });
+});
+
+// Add new equipment
+app.post("/api/equipment", (req, res) => {
+  const { EquipmentID, EquipmentName, TargetGroup, MaintainanceSchedule, ConditionStatus, GymID } = req.body;
+  const sql = "INSERT INTO Equipment (EquipmentID, EquipmentName, TargetGroup, MaintainanceSchedule, ConditionStatus, GymID) VALUES (?, ?, ?, ?, ?, ?)";
+  pool.query(sql, [EquipmentID, EquipmentName, TargetGroup, MaintainanceSchedule, ConditionStatus, GymID], (err, result) => {
+    if (err) {
+      res.status(500).send("Error adding equipment");
+      return;
+    }
+    res.status(201).send("Equipment added");
+  });
+});
+
+// Update equipment
+app.put("/api/equipment/:id", (req, res) => {
+  const { id } = req.params;
+  const { EquipmentID, EquipmentName, TargetGroup, MaintainanceSchedule, ConditionStatus, GymID } = req.body;
+  const sql = "UPDATE Equipment SET EquipmentID = ?, EquipmentName = ?, TargetGroup = ?, MaintainanceSchedule = ?, ConditionStatus = ?, GymID = ? WHERE EquipmentID = ?";
+  pool.query(sql, [EquipmentID, EquipmentName, TargetGroup, MaintainanceSchedule, ConditionStatus, GymID, id], (err, result) => {
+    if (err) {
+      res.status(500).send("Error updating equipment");
+      return;
+    }
+    res.send("Equipment updated");
+  });
+});
+
+// Delete equipment
+app.delete("/api/equipment/:id", (req, res) => {
+  const { id } = req.params;
+  pool.query("DELETE FROM Equipment WHERE EquipmentID = ?", [id], (err, result) => {
+    if (err) {
+      res.status(500).send("Error deleting equipment");
+      return;
+    }
+    res.send("Equipment deleted");
   });
 });
