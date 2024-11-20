@@ -47,7 +47,6 @@ const Staffs: React.FC = () => {
         (staff) =>
           staff.Fname.toLowerCase().includes(query) ||
           staff.Lname.toLowerCase().includes(query) ||
-          staff.GymID.toLowerCase().includes(query) ||
           staff.StaffSSN.toLowerCase().includes(query)
       )
     );

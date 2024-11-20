@@ -1,82 +1,121 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import AddClassForm from "./AddClassForm";
+import "../index.css";
 
-interface Classes {
+interface Class {
   ClassID: string;
   Name: string;
   Schedule: string;
-  InstructorId: string;
+  TrainerSSN: string;
   MaxCapacity: string;
 }
 
-const Classes: React.FC = () => {
+const ClassesPage: React.FC = () => {
+  const [classList, setClassList] = useState<Class[]>([]);
+  const [filteredClasses, setFilteredClasses] = useState<Class[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [selectedClass, setSelectedClass] = useState<Class | undefined>(
+    undefined
+  );
+
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
-  const [classList, setClassList] = useState<Classes[]>([]);
-  const [form, setForm] = useState<Classes>({
-    ClassID: "",
-    Name: "",
-    Schedule: "",
-    InstructorId: "",
-    MaxCapacity: "",
-  });
-
-  const handleLogout = () => {
-    console.log("Logged out");
-  };
-
-  const handleExit = () => {
-    console.log("Exit");
-  };
 
   useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const response = await axios.get("http://localhost:5001/api/classes");
+        console.log(response.data); // Check the data
+        setClassList(response.data);
+        setFilteredClasses(response.data);
+      } catch (error) {
+        console.error("Error fetching classes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchClasses();
   }, []);
 
-  const fetchClasses = () => {
-    axios
-      .get("/api/classes")
-      .then((response) => setClassList(response.data))
-      .catch((error) => console.error("Error fetching classes:", error));
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const query = event.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    setFilteredClasses(
+      classList.filter(
+        (cls) =>
+          cls.Name?.toLowerCase().includes(query) ||
+          cls.Schedule?.toLowerCase().includes(query) ||
+          cls.TrainerSSN?.toLowerCase().includes(query)
+      )
+    );
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleAddClass = () => {
+    setSelectedClass(undefined);
+    setShowForm(true);
   };
 
-  const createClass = () => {
-    axios
-      .post("/api/classes", form)
-      .then(() => {
-        fetchClasses();
-        setForm({
-          ClassID: "",
-          Name: "",
-          Schedule: "",
-          InstructorId: "",
-          MaxCapacity: "",
-        });
-      })
-      .catch((error) => console.error("Error creating class:", error));
+  const handleEditClass = (cls: Class) => {
+    setSelectedClass(cls);
+    setShowForm(true);
   };
 
-  const updateClass = (ClassID: string) => {
-    axios
-      .put(`/api/classes/${ClassID}`, form)
-      .then(() => fetchClasses())
-      .catch((error) => console.error("Error updating class:", error));
+  const handleSave = async (cls: Class) => {
+    try {
+      if (selectedClass) {
+        // Update existing class
+        await axios.put(
+          `http://localhost:5001/api/classes/${cls.ClassID}`,
+          cls
+        );
+        setClassList((prevClasses) =>
+          prevClasses.map((c) => (c.ClassID === cls.ClassID ? cls : c))
+        );
+        setFilteredClasses((prevClasses) =>
+          prevClasses.map((c) => (c.ClassID === cls.ClassID ? cls : c))
+        );
+      } else {
+        // Add new class
+        await axios.post("http://localhost:5001/api/classes", cls);
+        setClassList((prevClasses) => [...prevClasses, cls]);
+        setFilteredClasses((prevClasses) => [...prevClasses, cls]);
+      }
+      alert("Class saved successfully!");
+      setShowForm(false);
+    } catch (error) {
+      console.error("Error saving class:", error);
+      alert("Failed to save class.");
+    }
   };
 
-  const deleteClass = (ClassID: string) => {
-    axios
-      .delete(`/api/classes/${ClassID}`)
-      .then(() => fetchClasses())
-      .catch((error) => console.error("Error deleting class:", error));
+  const handleDeleteClass = async (classID: string) => {
+    if (window.confirm("Are you sure you want to delete this class?")) {
+      try {
+        await axios.delete(`http://localhost:5001/api/classes/${classID}`);
+        setClassList((prevClasses) =>
+          prevClasses.filter((c) => c.ClassID !== classID)
+        );
+        setFilteredClasses((prevClasses) =>
+          prevClasses.filter((c) => c.ClassID !== classID)
+        );
+        alert("Class deleted successfully!");
+        setShowForm(false);
+      } catch (error) {
+        console.error("Error deleting class:", error);
+        alert("Failed to delete class.");
+      }
+    }
   };
+
+  const handleCancel = () => setShowForm(false);
 
   return (
     <div>
-      {/* Header with navigation */}
       <header>
         <nav className="navbar">
           <button onClick={() => navigate("/members")}>Members</button>
@@ -87,85 +126,84 @@ const Classes: React.FC = () => {
             Retail Sales
           </button>
           <button onClick={() => navigate("/trainers")}>Trainers</button>
-          <button onClick={handleLogout}>Log Out</button>
-          <button onClick={handleExit}>Exit</button>
+          <button onClick={() => navigate("/")}>Log Out</button>
+          <button
+            onClick={() =>
+              window.confirm("Are you sure you want to exit?") && window.close()
+            }
+          >
+            Exit
+          </button>
         </nav>
       </header>
 
-      <h1>Classes</h1>
-      <div>
-        <h2>{form.ClassID ? "Update Class" : "Add New Class"}</h2>
-        <input
-          type="text"
-          name="ClassID"
-          value={form.ClassID}
-          onChange={handleInputChange}
-          placeholder="Class ID"
-        />
-        <input
-          type="text"
-          name="Name"
-          value={form.Name}
-          onChange={handleInputChange}
-          placeholder="Class Name"
-        />
-        <input
-          type="text"
-          name="Schedule"
-          value={form.Schedule}
-          onChange={handleInputChange}
-          placeholder="Schedule"
-        />
-        <input
-          type="text"
-          name="InstructorId"
-          value={form.InstructorId}
-          onChange={handleInputChange}
-          placeholder="Instructor ID"
-        />
-        <input
-          type="text"
-          name="MaxCapacity"
-          value={form.MaxCapacity}
-          onChange={handleInputChange}
-          placeholder="Max Capacity"
-        />
-        <button
-          onClick={form.ClassID ? () => updateClass(form.ClassID) : createClass}
-        >
-          {form.ClassID ? "Update Class" : "Add Class"}
-        </button>
-      </div>
+      <main>
+        <h1>Classes List</h1>
+        <div>
+          {!showForm && (
+            <input
+              type="text"
+              placeholder="Search Name, Schedule or TrainerSSN"
+              value={searchQuery}
+              onChange={handleSearch}
+              style={{ marginLeft: "10px", padding: "5px" }}
+            />
+          )}
+          <button onClick={handleAddClass} style={{ marginLeft: "10px" }}>
+            Add Class
+          </button>
+        </div>
+        <br />
+        <br />
 
-      <table>
-        <thead>
-          <tr>
-            <th>Class ID</th>
-            <th>Name</th>
-            <th>Schedule</th>
-            <th>Instructor ID</th>
-            <th>Max Capacity</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {classList.map((cls) => (
-            <tr key={cls.ClassID}>
-              <td>{cls.ClassID}</td>
-              <td>{cls.Name}</td>
-              <td>{cls.Schedule}</td>
-              <td>{cls.InstructorId}</td>
-              <td>{cls.MaxCapacity}</td>
-              <td>
-                <button onClick={() => setForm(cls)}>Edit</button>
-                <button onClick={() => deleteClass(cls.ClassID)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        {showForm && (
+          <div className="modal">
+            <AddClassForm
+              classData={selectedClass} // Can be undefined
+              onSave={handleSave}
+              onCancel={handleCancel}
+              onDelete={
+                selectedClass
+                  ? () => handleDeleteClass(selectedClass.ClassID)
+                  : undefined
+              }
+            />
+          </div>
+        )}
+
+        {loading ? (
+          <p>Loading classes...</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>ClassID</th>
+                <th>Name</th>
+                <th>Schedule</th>
+                <th>TrainerSSN</th>
+                <th>MaxCapacity</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredClasses.map((cls) => (
+                <tr key={cls.ClassID}>
+                  <td>{cls.ClassID}</td>
+                  <td>{cls.Name}</td>
+                  <td>{cls.Schedule}</td>
+                  <td>{cls.TrainerSSN}</td>
+                  <td>{cls.MaxCapacity}</td>
+                  <td>
+                    <button onClick={() => handleEditClass(cls)}>Edit</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </main>
     </div>
   );
 };
 
-export default Classes;
+export default ClassesPage;

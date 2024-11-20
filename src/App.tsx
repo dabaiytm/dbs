@@ -4,6 +4,7 @@ import Members from "./components/Members";
 import Staffs from "./components/Staffs";
 import Equipment from "./components/Equipment";
 import Footer from "./components/Footer";
+import Classes from "./components/Classes";
 import { Routes, Route } from "react-router-dom";
 
 const App = () => {
@@ -15,6 +16,7 @@ const App = () => {
         <Route path="/members" element={<Members />} />
         <Route path="/staffs" element={<Staffs />} />
         <Route path="/equipment" element={<Equipment />} />
+        <Route path="/classes" element={<Classes />} />
       </Routes>
       <Footer /> {/* Footer will be displayed on all pages */}
     </div>

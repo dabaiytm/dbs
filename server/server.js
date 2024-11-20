@@ -368,3 +368,65 @@ app.delete("/api/equipment/:id", (req, res) => {
     res.send("Equipment deleted");
   });
 });
+
+// Get all classes
+app.get("/api/classes", (req, res) => {
+  pool.query("SELECT * FROM Classes", (err, results) => {
+    if (err) {
+      res.status(500).send("Error fetching class data");
+      return;
+    }
+    res.json(results);
+  });
+});
+
+// Get class by ID
+app.get("/api/classes/:id", (req, res) => {
+  const { id } = req.params;
+  pool.query("SELECT * FROM Classes WHERE ClassID = ?", [id], (err, results) => {
+    if (err) {
+      res.status(500).send("Error fetching class");
+      return;
+    }
+    res.json(results[0]);
+  });
+});
+
+// Add new class
+app.post("/api/classes", (req, res) => {
+  const { ClassID, Name, Schedule, TrainerSSN, MaxCapacity } = req.body;
+  const sql = "INSERT INTO Classes (ClassID, Name, Schedule, TrainerSSN, MaxCapacity) VALUES (?, ?, ?, ?, ?)";
+  pool.query(sql, [ClassID, Name, Schedule, TrainerSSN, MaxCapacity], (err, result) => {
+    if (err) {
+      res.status(500).send("Error adding class");
+      return;
+    }
+    res.status(201).send("Class added");
+  });
+});
+
+// Update class
+app.put("/api/classes/:id", (req, res) => {
+  const { id } = req.params;
+  const { ClassID, Name, Schedule, TrainerSSN, MaxCapacity } = req.body;
+  const sql = "UPDATE Classes SET ClassID = ?, Name = ?, Schedule = ?, TrainerSSN = ?, MaxCapacity = ? WHERE ClassID = ?";
+  pool.query(sql, [ClassID, Name, Schedule, TrainerSSN, MaxCapacity, id], (err, result) => {
+    if (err) {
+      res.status(500).send("Error updating class");
+      return;
+    }
+    res.send("Class updated");
+  });
+});
+
+// Delete class
+app.delete("/api/classes/:id", (req, res) => {
+  const { id } = req.params;
+  pool.query("DELETE FROM Classes WHERE ClassID = ?", [id], (err, result) => {
+    if (err) {
+      res.status(500).send("Error deleting class");
+      return;
+    }
+    res.send("Class deleted");
+  });
+});
