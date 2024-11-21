@@ -122,9 +122,7 @@ const ClassesPage: React.FC = () => {
           <button onClick={() => navigate("/staffs")}>Staffs</button>
           <button onClick={() => navigate("/equipment")}>Equipment</button>
           <button onClick={() => navigate("/classes")}>Classes</button>
-          <button onClick={() => navigate("/retail-sales")}>
-            Retail Sales
-          </button>
+          <button onClick={() => navigate("/retailsales")}>Retail Sales</button>
           <button onClick={() => navigate("/trainers")}>Trainers</button>
           <button onClick={() => navigate("/")}>Log Out</button>
           <button

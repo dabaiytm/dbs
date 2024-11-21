@@ -430,3 +430,65 @@ app.delete("/api/classes/:id", (req, res) => {
     res.send("Class deleted");
   });
 });
+
+// Get all retail sales
+app.get("/api/retailsales", (req, res) => {
+  pool.query("SELECT * FROM Retail_Sales", (err, results) => {
+    if (err) {
+      res.status(500).send("Error fetching retail sales data");
+      return;
+    }
+    res.json(results);
+  });
+});
+
+// Get retail sale by ID
+app.get("/api/retailsales/:id", (req, res) => {
+  const { id } = req.params;
+  pool.query("SELECT * FROM Retail_Sales WHERE TransactionID = ?", [id], (err, results) => {
+    if (err) {
+      res.status(500).send("Error fetching retail sale");
+      return;
+    }
+    res.json(results[0]);
+  });
+});
+
+// Add new retail sale
+app.post("/api/retailsales", (req, res) => {
+  const { ProductID, SalesDate, PaymentMethod, Stock, RestockSchedule, GymID, TransactionID, Price } = req.body;
+  const sql = "INSERT INTO Retail_Sales (ProductID, SalesDate, PaymentMethod, Stock, RestockSchedule, GymID, TransactionID, Price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+  pool.query(sql, [ProductID, SalesDate, PaymentMethod, Stock, RestockSchedule, GymID, TransactionID, Price], (err, result) => {
+    if (err) {
+      res.status(500).send("Error adding retail sale");
+      return;
+    }
+    res.status(201).send("Retail sale added");
+  });
+});
+
+// Update retail sale
+app.put("/api/retailsales/:id", (req, res) => {
+  const { id } = req.params;
+  const { ProductID, SalesDate, PaymentMethod, Stock, RestockSchedule, GymID, TransactionID, Price } = req.body;
+  const sql = "UPDATE Retail_Sales SET ProductID = ?, SalesDate = ?, PaymentMethod = ?, Stock = ?, RestockSchedule = ?, GymID = ?, TransactionID = ?, Price = ? WHERE TransactionID = ?";
+  pool.query(sql, [ProductID, SalesDate, PaymentMethod, Stock, RestockSchedule, GymID, TransactionID, Price, id], (err, result) => {
+    if (err) {
+      res.status(500).send("Error updating retail sale");
+      return;
+    }
+    res.send("Retail sale updated");
+  });
+});
+
+// Delete retail sale
+app.delete("/api/retailsales/:id", (req, res) => {
+  const { id } = req.params;
+  pool.query("DELETE FROM Retail_Sales WHERE TransactionID = ?", [id], (err, result) => {
+    if (err) {
+      res.status(500).send("Error deleting retail sale");
+      return;
+    }
+    res.send("Retail sale deleted");
+  });
+});
