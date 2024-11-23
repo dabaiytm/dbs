@@ -7,7 +7,7 @@ interface Equipment {
   TargetGroup: string;
   MaintainanceSchedule: string;
   ConditionStatus: string;
-  GymID: number | null;
+  GymID: string;
 }
 
 interface AddEquipmentFormProps {
@@ -29,7 +29,7 @@ const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
     TargetGroup: "",
     MaintainanceSchedule: "",
     ConditionStatus: "",
-    GymID: null,
+    GymID: "",
   });
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
         TargetGroup: "",
         MaintainanceSchedule: "",
         ConditionStatus: "",
-        GymID: null,
+        GymID: "",
       });
     }
   }, [equipment]);
@@ -60,6 +60,7 @@ const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
   return (
     <form onSubmit={handleSubmit}>
       <h2>{equipment ? "Edit Equipment" : "Add Equipment"}</h2>
+
       <input
         type="text"
         name="EquipmentID"
@@ -93,7 +94,6 @@ const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
         value={formData.MaintainanceSchedule}
         onChange={handleChange}
         placeholder="MaintainanceSchedule"
-        required
       />
 
       <input
@@ -104,6 +104,15 @@ const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
         placeholder="Condition Status"
         required
       />
+
+      <input
+        type="number"
+        name="GymID"
+        value={formData.GymID !== null ? formData.GymID : ""}
+        onChange={handleChange}
+        placeholder="Gym ID"
+      />
+
       <br />
       <button type="submit">Save</button>
       <button type="button" onClick={onCancel}>

@@ -121,14 +121,8 @@ const Staffs: React.FC = () => {
           <button onClick={() => navigate("/classes")}>Classes</button>
           <button onClick={() => navigate("/retailsales")}>Retail Sales</button>
           <button onClick={() => navigate("/trainers")}>Trainers</button>
+          <button onClick={() => navigate("/feedback")}>Feedback</button>
           <button onClick={() => navigate("/")}>Log Out</button>
-          <button
-            onClick={() =>
-              window.confirm("Are you sure you want to exit?") && window.close()
-            }
-          >
-            Exit
-          </button>
         </nav>
       </header>
 
@@ -169,7 +163,7 @@ const Staffs: React.FC = () => {
         {loading ? (
           <p>Loading staff...</p>
         ) : (
-          <table id="staff_table">
+          <table className="table">
             <thead>
               <tr>
                 <th>StaffSSN</th>

@@ -492,3 +492,127 @@ app.delete("/api/retailsales/:id", (req, res) => {
     res.send("Retail sale deleted");
   });
 });
+
+// Get all trainers
+app.get("/api/trainers", (req, res) => {
+  pool.query("SELECT * FROM Trainers", (err, results) => {
+    if (err) {
+      res.status(500).send("Error fetching trainers data");
+      return;
+    }
+    res.json(results);
+  });
+});
+
+// Get trainer by ID
+app.get("/api/trainers/:id", (req, res) => {
+  const { id } = req.params;
+  pool.query("SELECT * FROM Trainers WHERE TrainerSSN = ?", [id], (err, results) => {
+    if (err) {
+      res.status(500).send("Error fetching trainer");
+      return;
+    }
+    res.json(results[0]);
+  });
+});
+
+// Add new trainer
+app.post("/api/trainers", (req, res) => {
+  const { TrainerSSN, Fname, Lname, GymID } = req.body;
+  const sql = "INSERT INTO Trainers (TrainerSSN, Fname, Lname, GymID) VALUES (?, ?, ?, ?)";
+  pool.query(sql, [TrainerSSN, Fname, Lname, GymID], (err) => {
+    if (err) {
+      res.status(500).send("Error adding trainer");
+      return;
+    }
+    res.status(201).send("Trainer added");
+  });
+});
+
+// Update trainer
+app.put("/api/trainers/:id", (req, res) => {
+  const { id } = req.params;
+  const { TrainerSSN, Fname, Lname, GymID } = req.body;
+  const sql = "UPDATE Trainers SET TrainerSSN = ?, Fname = ?, Lname = ?, GymID = ? WHERE TrainerSSN = ?";
+  pool.query(sql, [TrainerSSN, Fname, Lname, GymID, id], (err, result) => {
+    if (err) {
+      res.status(500).send("Error updating trainer");
+      return;
+    }
+    res.send("Trainer updated");
+  });
+});
+
+// Delete trainer
+app.delete("/api/trainers/:id", (req, res) => {
+  const { id } = req.params;
+  pool.query("DELETE FROM Trainers WHERE TrainerSSN = ?", [id], (err, result) => {
+    if (err) {
+      res.status(500).send("Error deleting trainer");
+      return;
+    }
+    res.send("Trainer deleted");
+  });
+});
+
+// Get all feedback
+app.get("/api/feedback", (req, res) => {
+  pool.query("SELECT * FROM Feedback", (err, results) => {
+    if (err) {
+      res.status(500).send("Error fetching feedback data");
+      return;
+    }
+    res.json(results);
+  });
+});
+
+// Get feedback by ID
+app.get("/api/feedback/:id", (req, res) => {
+  const { id } = req.params;
+  pool.query("SELECT * FROM Feedback WHERE FeedbackID = ?", [id], (err, results) => {
+    if (err) {
+      res.status(500).send("Error fetching feedback");
+      return;
+    }
+    res.json(results[0]);
+  });
+});
+
+// Add new feedback
+app.post("/api/feedback", (req, res) => {
+  const { FeedbackID, MemID, FeedbackDate } = req.body;
+  const sql = "INSERT INTO Feedback (FeedbackID, MemID, FeedbackDate) VALUES (?, ?, ?)";
+  pool.query(sql, [FeedbackID, MemID, FeedbackDate], (err) => {
+    if (err) {
+      res.status(500).send("Error adding feedback");
+      return;
+    }
+    res.status(201).send("Feedback added");
+  });
+});
+
+// Update feedback
+app.put("/api/feedback/:id", (req, res) => {
+  const { id } = req.params;
+  const { FeedbackID, MemID, FeedbackDate } = req.body;
+  const sql = "UPDATE Feedback SET FeedbackID = ?, MemID = ?, FeedbackDate = ? WHERE FeedbackID = ?";
+  pool.query(sql, [FeedbackID, MemID, FeedbackDate, id], (err) => {
+    if (err) {
+      res.status(500).send("Error updating feedback");
+      return;
+    }
+    res.send("Feedback updated");
+  });
+});
+
+// Delete feedback
+app.delete("/api/feedback/:id", (req, res) => {
+  const { id } = req.params;
+  pool.query("DELETE FROM Feedback WHERE FeedbackID = ?", [id], (err) => {
+    if (err) {
+      res.status(500).send("Error deleting feedback");
+      return;
+    }
+    res.send("Feedback deleted");
+  });
+});

@@ -10,7 +10,7 @@ interface Equipment {
   TargetGroup: string;
   MaintainanceSchedule: string;
   ConditionStatus: string;
-  GymID: number | null;
+  GymID: string;
 }
 
 const EquipmentPage: React.FC = () => {
@@ -131,14 +131,8 @@ const EquipmentPage: React.FC = () => {
           <button onClick={() => navigate("/classes")}>Classes</button>
           <button onClick={() => navigate("/retailsales")}>Retail Sales</button>
           <button onClick={() => navigate("/trainers")}>Trainers</button>
+          <button onClick={() => navigate("/feedback")}>Feedback</button>
           <button onClick={() => navigate("/")}>Log Out</button>
-          <button
-            onClick={() =>
-              window.confirm("Are you sure you want to exit?") && window.close()
-            }
-          >
-            Exit
-          </button>
         </nav>
       </header>
 
@@ -179,36 +173,38 @@ const EquipmentPage: React.FC = () => {
         {loading ? (
           <p>Loading equipment...</p>
         ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>EquipmentID</th>
-                <th>EquipmentName</th>
-                <th>Target Group</th>
-                <th>Maintainance Schedule</th>
-                <th>Condition Status</th>
-                <th>Gym ID</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredEquipment.map((equipment) => (
-                <tr key={equipment.EquipmentID}>
-                  <td>{equipment.EquipmentID}</td>
-                  <td>{equipment.EquipmentName}</td>
-                  <td>{equipment.TargetGroup}</td>
-                  <td>{equipment.MaintainanceSchedule}</td>
-                  <td>{equipment.ConditionStatus}</td>
-                  <td>{equipment.GymID}</td>
-                  <td>
-                    <button onClick={() => handleEditEquipment(equipment)}>
-                      Edit
-                    </button>
-                  </td>
+          <div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>EquipmentID</th>
+                  <th>EquipmentName</th>
+                  <th>Target Group</th>
+                  <th>Maintainance Schedule</th>
+                  <th>Condition Status</th>
+                  <th>Gym ID</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredEquipment.map((equipment) => (
+                  <tr key={equipment.EquipmentID}>
+                    <td>{equipment.EquipmentID}</td>
+                    <td>{equipment.EquipmentName}</td>
+                    <td>{equipment.TargetGroup}</td>
+                    <td>{equipment.MaintainanceSchedule}</td>
+                    <td>{equipment.ConditionStatus}</td>
+                    <td>{equipment.GymID}</td>
+                    <td>
+                      <button onClick={() => handleEditEquipment(equipment)}>
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </main>
     </div>

@@ -1,211 +1,202 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import AddTrainerForm from "./AddTrainerForm";
+import "../index.css";
 
 interface Trainer {
-  TrainerID: string;
+  TrainerSSN: string;
   Fname: string;
   Lname: string;
-  Expertise: string;
-  Availability: string;
-  Schedule: string;
-  Certification: string;
-  AssociateMember: string;
+  GymID: number;
 }
 
-const Trainer: React.FC = () => {
+const TrainerPage: React.FC = () => {
+  const [trainers, setTrainers] = useState<Trainer[]>([]);
+  const [filteredTrainers, setFilteredTrainers] = useState<Trainer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [selectedTrainer, setSelectedTrainer] = useState<Trainer | undefined>(
+    undefined
+  );
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
-  const [trainerList, setTrainerList] = useState<Trainer[]>([]);
-  const [form, setForm] = useState<Trainer>({
-    TrainerID: "",
-    Fname: "",
-    Lname: "",
-    Expertise: "",
-    Availability: "",
-    Schedule: "",
-    Certification: "",
-    AssociateMember: "",
-  });
-
-  const handleLogout = () => {
-    console.log("Logged out");
-  };
-
-  const handleExit = () => {
-    console.log("Exit");
-  };
 
   useEffect(() => {
+    const fetchTrainers = async () => {
+      try {
+        const response = await axios.get("http://localhost:5001/api/trainers");
+        setTrainers(response.data);
+        setFilteredTrainers(response.data);
+      } catch (error) {
+        console.error("Error fetching trainers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchTrainers();
   }, []);
 
-  const fetchTrainers = () => {
-    axios
-      .get("/api/trainers")
-      .then((response) => setTrainerList(response.data))
-      .catch((error) => console.error("Error fetching trainers:", error));
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const query = event.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    setFilteredTrainers(
+      trainers.filter(
+        (trainer) =>
+          trainer.Fname.toLowerCase().includes(query) ||
+          trainer.Lname.toLowerCase().includes(query) ||
+          trainer.TrainerSSN.toLowerCase().includes(query)
+      )
+    );
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleAddTrainer = () => {
+    setSelectedTrainer(undefined);
+    setShowForm(true);
   };
 
-  const createTrainer = () => {
-    axios
-      .post("/api/trainers", form)
-      .then(() => {
-        fetchTrainers();
-        setForm({
-          TrainerID: "",
-          Fname: "",
-          Lname: "",
-          Expertise: "",
-          Availability: "",
-          Schedule: "",
-          Certification: "",
-          AssociateMember: "",
-        });
-      })
-      .catch((error) => console.error("Error creating trainer:", error));
+  const handleEditTrainer = (trainer: Trainer) => {
+    setSelectedTrainer(trainer);
+    setShowForm(true);
   };
 
-  const updateTrainer = (TrainerID: string) => {
-    axios
-      .put(`/api/trainers/${TrainerID}`, form)
-      .then(() => fetchTrainers())
-      .catch((error) => console.error("Error updating trainer:", error));
+  const handleSave = async (trainer: Trainer) => {
+    try {
+      if (selectedTrainer) {
+        // Update existing trainer
+        await axios.put(
+          `http://localhost:5001/api/trainers/${trainer.TrainerSSN}`,
+          trainer
+        );
+        setTrainers((prevTrainers) =>
+          prevTrainers.map((t) =>
+            t.TrainerSSN === trainer.TrainerSSN ? trainer : t
+          )
+        );
+        setFilteredTrainers((prevTrainers) =>
+          prevTrainers.map((t) =>
+            t.TrainerSSN === trainer.TrainerSSN ? trainer : t
+          )
+        );
+      } else {
+        // Add new trainer
+        await axios.post("http://localhost:5001/api/trainers", trainer);
+        setTrainers((prevTrainers) => [...prevTrainers, trainer]);
+        setFilteredTrainers((prevTrainers) => [...prevTrainers, trainer]);
+      }
+      alert("Trainer saved successfully!");
+      setShowForm(false);
+    } catch (error) {
+      console.error("Error saving trainer:", error);
+      alert("Failed to save trainer.");
+    }
   };
 
-  const deleteTrainer = (TrainerID: string) => {
-    axios
-      .delete(`/api/trainers/${TrainerID}`)
-      .then(() => fetchTrainers())
-      .catch((error) => console.error("Error deleting trainer:", error));
+  const handleDeleteTrainer = async (trainerID: string) => {
+    if (window.confirm("Are you sure you want to delete this trainer?")) {
+      try {
+        await axios.delete(`http://localhost:5001/api/trainers/${trainerID}`);
+        setTrainers((prevTrainers) =>
+          prevTrainers.filter((trainer) => trainer.TrainerSSN !== trainerID)
+        );
+        setFilteredTrainers((prevTrainers) =>
+          prevTrainers.filter((trainer) => trainer.TrainerSSN !== trainerID)
+        );
+        alert("Trainer deleted successfully!");
+        setShowForm(false);
+      } catch (error) {
+        console.error("Error deleting trainer:", error);
+        alert("Failed to delete trainer.");
+      }
+    }
   };
+
+  const handleCancel = () => setShowForm(false);
 
   return (
     <div>
-      {/* Header with navigation */}
       <header>
         <nav className="navbar">
           <button onClick={() => navigate("/members")}>Members</button>
           <button onClick={() => navigate("/staffs")}>Staffs</button>
           <button onClick={() => navigate("/equipment")}>Equipment</button>
           <button onClick={() => navigate("/classes")}>Classes</button>
-          <button onClick={() => navigate("/retail-sales")}>
-            Retail Sales
-          </button>
+          <button onClick={() => navigate("/retailsales")}>Retail Sales</button>
           <button onClick={() => navigate("/trainers")}>Trainers</button>
-          <button onClick={handleLogout}>Log Out</button>
-          <button onClick={handleExit}>Exit</button>
+          <button onClick={() => navigate("/feedback")}>Feedback</button>
+          <button onClick={() => navigate("/")}>Log Out</button>
         </nav>
       </header>
 
-      <h1>Trainers</h1>
-      <div>
-        <h2>{form.TrainerID ? "Update Trainer" : "Add New Trainer"}</h2>
-        <input
-          type="text"
-          name="TrainerID"
-          value={form.TrainerID}
-          onChange={handleInputChange}
-          placeholder="Trainer ID"
-        />
-        <input
-          type="text"
-          name="Fname"
-          value={form.Fname}
-          onChange={handleInputChange}
-          placeholder="First Name"
-        />
-        <input
-          type="text"
-          name="Lname"
-          value={form.Lname}
-          onChange={handleInputChange}
-          placeholder="Last Name"
-        />
-        <input
-          type="text"
-          name="Expertise"
-          value={form.Expertise}
-          onChange={handleInputChange}
-          placeholder="Expertise"
-        />
-        <input
-          type="text"
-          name="Availability"
-          value={form.Availability}
-          onChange={handleInputChange}
-          placeholder="Availability"
-        />
-        <input
-          type="text"
-          name="Schedule"
-          value={form.Schedule}
-          onChange={handleInputChange}
-          placeholder="Schedule"
-        />
-        <input
-          type="text"
-          name="Certification"
-          value={form.Certification}
-          onChange={handleInputChange}
-          placeholder="Certification"
-        />
-        <input
-          type="text"
-          name="AssociateMember"
-          value={form.AssociateMember}
-          onChange={handleInputChange}
-          placeholder="Associate Member"
-        />
-        <button
-          onClick={
-            form.TrainerID ? () => updateTrainer(form.TrainerID) : createTrainer
-          }
-        >
-          {form.TrainerID ? "Update Trainer" : "Add Trainer"}
-        </button>
-      </div>
+      <main>
+        <h1>Trainers List</h1>
+        <div>
+          {!showForm && (
+            <input
+              type="text"
+              placeholder="Search by ID, First or Last Name"
+              value={searchQuery}
+              onChange={handleSearch}
+              style={{ marginLeft: "10px", padding: "5px" }}
+            />
+          )}
+          <button onClick={handleAddTrainer} style={{ marginLeft: "10px" }}>
+            Add Trainer
+          </button>
+        </div>
+        <br />
+        <br />
 
-      <table>
-        <thead>
-          <tr>
-            <th>Trainer ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Expertise</th>
-            <th>Availability</th>
-            <th>Schedule</th>
-            <th>Certification</th>
-            <th>Associate Member</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {trainerList.map((trainer) => (
-            <tr key={trainer.TrainerID}>
-              <td>{trainer.TrainerID}</td>
-              <td>{trainer.Fname}</td>
-              <td>{trainer.Lname}</td>
-              <td>{trainer.Expertise}</td>
-              <td>{trainer.Availability}</td>
-              <td>{trainer.Schedule}</td>
-              <td>{trainer.Certification}</td>
-              <td>{trainer.AssociateMember}</td>
-              <td>
-                <button onClick={() => setForm(trainer)}>Edit</button>
-                <button onClick={() => deleteTrainer(trainer.TrainerID)}>
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        {showForm && (
+          <div className="modal">
+            <AddTrainerForm
+              trainer={selectedTrainer} // Can be undefined
+              onSave={handleSave}
+              onCancel={handleCancel}
+              onDelete={
+                selectedTrainer
+                  ? () => handleDeleteTrainer(selectedTrainer.TrainerSSN)
+                  : undefined
+              }
+            />
+          </div>
+        )}
+
+        {loading ? (
+          <p>Loading trainers...</p>
+        ) : (
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Trainer ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Gym ID</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredTrainers.map((trainer) => (
+                <tr key={trainer.TrainerSSN}>
+                  <td>{trainer.TrainerSSN}</td>
+                  <td>{trainer.Fname}</td>
+                  <td>{trainer.Lname}</td>
+                  <td>{trainer.GymID}</td>
+                  <td>
+                    <button onClick={() => handleEditTrainer(trainer)}>
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </main>
     </div>
   );
 };
 
-export default Trainer;
+export default TrainerPage;
