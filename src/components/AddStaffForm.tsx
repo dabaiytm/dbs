@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "../index.css";
 
 interface Staff {
   StaffSSN: string;
@@ -97,16 +98,17 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({
       />
 
       <br />
-
-      <button type="submit">Save</button>
-      <button type="button" onClick={onCancel}>
-        Cancel
-      </button>
-      {onDelete && (
-        <button type="button" onClick={onDelete}>
-          Delete
+      <div className="btns">
+        <button type="submit">Save</button>
+        <button type="button" onClick={onCancel}>
+          Cancel
         </button>
-      )}
+        {onDelete && (
+          <button type="button" onClick={onDelete}>
+            Delete
+          </button>
+        )}
+      </div>
     </form>
   );
 };

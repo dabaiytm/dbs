@@ -67,10 +67,6 @@ button:focus-visible {
   }
 }
 
-/* #staff_table {
-  margin: 0 auto;
-} */
-
 table,
 th,
 td {
@@ -107,4 +103,21 @@ h1 {
 
 .table {
   margin: 0 auto;
+}
+
+.input_bar {
+  display: flex;
+  gap: 10px;
+  width: 900px;
+}
+
+.input_bar textarea {
+  flex-basis: 100%; /* Forces the textarea to occupy the full line */
+  width: 100%; /* Ensures it spans the full width of the container */
+}
+
+.btns button {
+  margin-top: 20px;
+  margin-left: 20px;
+  margin-bottom: 20px;
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "../index.css";
 
 interface RetailSale {
   ProductID: string;
@@ -73,94 +74,97 @@ const AddRetailSalesForm: React.FC<AddRetailSalesFormProps> = ({
   return (
     <form onSubmit={handleSubmit}>
       <h2>{sale ? "Edit Retail Sale" : "Add Retail Sale"}</h2>
+      <div>
+        <input
+          type="text"
+          name="ProductID"
+          value={formData.ProductID}
+          onChange={handleChange}
+          placeholder="Product ID"
+          required
+        />
 
-      <input
-        type="text"
-        name="ProductID"
-        value={formData.ProductID}
-        onChange={handleChange}
-        placeholder="Product ID"
-        required
-      />
+        <input
+          type="date"
+          name="SalesDate"
+          value={formData.SalesDate}
+          onChange={handleChange}
+          placeholder="Sales Date"
+          required
+        />
 
-      <input
-        type="date"
-        name="SalesDate"
-        value={formData.SalesDate}
-        onChange={handleChange}
-        placeholder="Sales Date"
-        required
-      />
+        <input
+          type="number"
+          name="Stock"
+          value={formData.Stock}
+          onChange={handleChange}
+          placeholder="Stock"
+          required
+        />
 
-      <input
-        type="number"
-        name="Stock"
-        value={formData.Stock}
-        onChange={handleChange}
-        placeholder="Stock"
-        required
-      />
+        <input
+          type="text"
+          name="RestockSchedule"
+          value={formData.RestockSchedule}
+          onChange={handleChange}
+          placeholder="Restock Schedule"
+          required
+        />
 
-      <input
-        type="text"
-        name="RestockSchedule"
-        value={formData.RestockSchedule}
-        onChange={handleChange}
-        placeholder="Restock Schedule"
-        required
-      />
+        <input
+          type="number"
+          name="GymID"
+          value={formData.GymID ?? ""}
+          onChange={handleChange}
+          placeholder="Gym ID"
+        />
 
-      <input
-        type="number"
-        name="GymID"
-        value={formData.GymID ?? ""}
-        onChange={handleChange}
-        placeholder="Gym ID"
-      />
+        <input
+          type="number"
+          name="TransactionID"
+          value={formData.TransactionID}
+          onChange={handleChange}
+          placeholder="Transaction ID"
+          required
+        />
 
-      <input
-        type="number"
-        name="TransactionID"
-        value={formData.TransactionID}
-        onChange={handleChange}
-        placeholder="Transaction ID"
-        required
-      />
+        {/* Price Input */}
+        <input
+          type="number"
+          name="Price"
+          value={formData.Price}
+          onChange={handleChange}
+          placeholder="Price"
+          required
+        />
 
-      {/* Price Input */}
-      <input
-        type="number"
-        name="Price"
-        value={formData.Price}
-        onChange={handleChange}
-        placeholder="Price"
-        required
-      />
-
-      <select
-        name="PaymentMethod"
-        value={formData.PaymentMethod}
-        onChange={handleChange}
-        required
-      >
-        <option value="" disabled>
-          Select Payment Method
-        </option>
-        <option value="Cash">Cash</option>
-        <option value="Card">Card</option>
-        <option value="Online">Online</option>
-      </select>
+        <select
+          name="PaymentMethod"
+          value={formData.PaymentMethod}
+          onChange={handleChange}
+          required
+        >
+          <option value="" disabled>
+            Select Payment Method
+          </option>
+          <option value="Cash">Cash</option>
+          <option value="Card">Card</option>
+          <option value="Online">Online</option>
+        </select>
+      </div>
 
       <br />
-      <button type="submit">Save</button>
-      <button type="button" onClick={onCancel}>
-        Cancel
-      </button>
-      {onDelete && (
-        <button type="button" onClick={onDelete}>
-          Delete
+      <div className="btns">
+        <button type="submit">Save</button>
+        <button type="button" onClick={onCancel}>
+          Cancel
         </button>
-      )}
+        {onDelete && (
+          <button type="button" onClick={onDelete}>
+            Delete
+          </button>
+        )}
+      </div>
     </form>
   );
 };

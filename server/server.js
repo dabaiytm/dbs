@@ -566,53 +566,243 @@ app.get("/api/feedback", (req, res) => {
   });
 });
 
-// Get feedback by ID
+// Get a single feedback with details by FeedbackID
 app.get("/api/feedback/:id", (req, res) => {
-  const { id } = req.params;
-  pool.query("SELECT * FROM Feedback WHERE FeedbackID = ?", [id], (err, results) => {
-    if (err) {
-      res.status(500).send("Error fetching feedback");
-      return;
+  const feedbackID = req.params.id;
+  pool.query(
+    `SELECT 
+        f.FeedbackID, 
+        f.MemID, 
+        f.FeedbackDate, 
+        fd.FeedbackReview, 
+        fd.Rating 
+      FROM Feedback f
+      JOIN Feedback_Details fd 
+      ON f.MemID = fd.MemID AND f.FeedbackDate = fd.FeedbackDate 
+      WHERE f.FeedbackID = ?`,
+    [feedbackID],
+    (err, results) => {
+      if (err) {
+        res.status(500).send("Error fetching feedback data");
+        return;
+      }
+      if (results.length > 0) {
+        res.json(results[0]); // Return the merged result
+      } else {
+        res.status(404).send("Feedback not found");
+      }
     }
-    res.json(results[0]);
-  });
+  );
 });
+
+
+
+
+// Get feedback by ID
+// app.get("/api/feedback/:id", (req, res) => {
+//   const { id } = req.params;
+//   pool.query("SELECT * FROM Feedback WHERE FeedbackID = ?", [id], (err, results) => {
+//     if (err) {
+//       res.status(500).send("Error fetching feedback");
+//       return;
+//     }
+//     res.json(results[0]);
+//   });
+// });
 
 // Add new feedback
 app.post("/api/feedback", (req, res) => {
-  const { FeedbackID, MemID, FeedbackDate } = req.body;
-  const sql = "INSERT INTO Feedback (FeedbackID, MemID, FeedbackDate) VALUES (?, ?, ?)";
-  pool.query(sql, [FeedbackID, MemID, FeedbackDate], (err) => {
+  const { FeedbackID, MemID, FeedbackDate, FeedbackReview, Rating } = req.body;
+
+  // Query for Feedback table
+  const sqlFeedback = "INSERT INTO Feedback (FeedbackID, MemID, FeedbackDate) VALUES (?, ?, ?)";
+  // Query for Feedback_Details table
+  const sqlFeedbackDetails =
+    "INSERT INTO Feedback_Details (MemID, FeedbackDate, FeedbackReview, Rating) VALUES (?, ?, ?, ?)";
+
+  // Use a transaction to ensure atomicity
+  pool.getConnection((err, connection) => {
     if (err) {
-      res.status(500).send("Error adding feedback");
+      res.status(500).send("Error acquiring database connection");
       return;
     }
-    res.status(201).send("Feedback added");
+
+    connection.beginTransaction((err) => {
+      if (err) {
+        connection.release();
+        res.status(500).send("Error starting transaction");
+        return;
+      }
+
+      // Insert into Feedback table
+      connection.query(sqlFeedback, [FeedbackID, MemID, FeedbackDate], (err) => {
+        if (err) {
+          connection.rollback(() => {
+            connection.release();
+            res.status(500).send("Error adding feedback");
+          });
+          return;
+        }
+
+        // Insert into Feedback_Details table
+        connection.query(
+          sqlFeedbackDetails,
+          [MemID, FeedbackDate, FeedbackReview, Rating],
+          (err) => {
+            if (err) {
+              connection.rollback(() => {
+                connection.release();
+                res.status(500).send("Error adding feedback details");
+              });
+              return;
+            }
+
+            // Commit the transaction
+            connection.commit((err) => {
+              connection.release();
+              if (err) {
+                res.status(500).send("Error committing transaction");
+                return;
+              }
+              res.status(201).send("Feedback and feedback details added");
+            });
+          }
+        );
+      });
+    });
   });
 });
+
+
+// Add new feedback
+// app.post("/api/feedback", (req, res) => {
+//   const { FeedbackID, MemID, FeedbackDate } = req.body;
+//   const sql = "INSERT INTO Feedback (FeedbackID, MemID, FeedbackDate) VALUES (?, ?, ?)";
+//   pool.query(sql, [FeedbackID, MemID, FeedbackDate], (err) => {
+//     if (err) {
+//       res.status(500).send("Error adding feedback");
+//       return;
+//     }
+//     res.status(201).send("Feedback added");
+//   });
+// });
+
+// Update feedback
+// app.put("/api/feedback/:id", (req, res) => {
+//   const { id } = req.params;
+//   const { FeedbackID, MemID, FeedbackDate } = req.body;
+//   const sql = "UPDATE Feedback SET FeedbackID = ?, MemID = ?, FeedbackDate = ? WHERE FeedbackID = ?";
+//   pool.query(sql, [FeedbackID, MemID, FeedbackDate, id], (err) => {
+//     if (err) {
+//       res.status(500).send("Error updating feedback");
+//       return;
+//     }
+//     res.send("Feedback updated");
+//   });
+// });
 
 // Update feedback
 app.put("/api/feedback/:id", (req, res) => {
   const { id } = req.params;
-  const { FeedbackID, MemID, FeedbackDate } = req.body;
-  const sql = "UPDATE Feedback SET FeedbackID = ?, MemID = ?, FeedbackDate = ? WHERE FeedbackID = ?";
-  pool.query(sql, [FeedbackID, MemID, FeedbackDate, id], (err) => {
+  const { FeedbackID, MemID, FeedbackDate, FeedbackReview, Rating } = req.body;
+
+  // Query for Feedback table
+  const sqlFeedback =
+    "UPDATE Feedback SET FeedbackID = ?, MemID = ?, FeedbackDate = ? WHERE FeedbackID = ?";
+  // Query for Feedback_Details table
+  const sqlFeedbackDetails =
+    "UPDATE Feedback_Details SET FeedbackReview = ?, Rating = ? WHERE MemID = ? AND FeedbackDate = ?";
+
+  // Use a transaction to ensure atomicity
+  pool.getConnection((err, connection) => {
     if (err) {
-      res.status(500).send("Error updating feedback");
+      res.status(500).send("Error acquiring database connection");
       return;
     }
-    res.send("Feedback updated");
+
+    connection.beginTransaction((err) => {
+      if (err) {
+        connection.release();
+        res.status(500).send("Error starting transaction");
+        return;
+      }
+
+      // Update Feedback table
+      connection.query(sqlFeedback, [FeedbackID, MemID, FeedbackDate, id], (err) => {
+        if (err) {
+          connection.rollback(() => {
+            connection.release();
+            res.status(500).send("Error updating feedback");
+          });
+          return;
+        }
+
+        // Update Feedback_Details table
+        connection.query(
+          sqlFeedbackDetails,
+          [FeedbackReview, Rating, MemID, FeedbackDate],
+          (err) => {
+            if (err) {
+              connection.rollback(() => {
+                connection.release();
+                res.status(500).send("Error updating feedback details");
+              });
+              return;
+            }
+
+            // Commit the transaction
+            connection.commit((err) => {
+              connection.release();
+              if (err) {
+                res.status(500).send("Error committing transaction");
+                return;
+              }
+              res.send("Feedback and feedback details updated");
+            });
+          }
+        );
+      });
+    });
   });
 });
 
+
 // Delete feedback
-app.delete("/api/feedback/:id", (req, res) => {
-  const { id } = req.params;
-  pool.query("DELETE FROM Feedback WHERE FeedbackID = ?", [id], (err) => {
+// app.delete("/api/feedback/:id", (req, res) => {
+//   const { id } = req.params;
+//   pool.query("DELETE FROM Feedback WHERE FeedbackID = ?", [id], (err) => {
+//     if (err) {
+//       res.status(500).send("Error deleting feedback");
+//       return;
+//     }
+//     res.send("Feedback deleted");
+//   });
+// });
+
+// Delete feedback
+app.delete("/api/feedback/:MemID/:FeedbackDate", (req, res) => {
+  const { MemID, FeedbackDate } = req.params;
+
+  const deleteQuery = `
+    DELETE f, fd
+    FROM Feedback f
+    JOIN Feedback_Details fd
+    ON f.MemID = fd.MemID AND f.FeedbackDate = fd.FeedbackDate
+    WHERE f.MemID = ? AND f.FeedbackDate = ?;
+  `;
+
+  pool.query(deleteQuery, [MemID, FeedbackDate], (err, results) => {
     if (err) {
+      console.error("Error deleting feedback:", err);
       res.status(500).send("Error deleting feedback");
       return;
     }
-    res.send("Feedback deleted");
+
+    if (results.affectedRows > 0) {
+      res.send("Feedback and related details deleted");
+    } else {
+      res.status(404).send("No matching feedback found");
+    }
   });
 });
+

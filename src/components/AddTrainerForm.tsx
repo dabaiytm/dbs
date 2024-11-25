@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "../index.css";
 
 interface Trainer {
   TrainerSSN: string;
@@ -56,53 +57,56 @@ const AddTrainerForm: React.FC<AddTrainerFormProps> = ({
   return (
     <form onSubmit={handleSubmit}>
       <h2>{trainer ? "Edit Trainer" : "Add Trainer"}</h2>
+      <div className="input_bar">
+        <input
+          type="text"
+          name="TrainerSSN"
+          value={formData.TrainerSSN}
+          onChange={handleChange}
+          placeholder="Trainer SSN"
+          required
+        />
 
-      <input
-        type="text"
-        name="TrainerSSN"
-        value={formData.TrainerSSN}
-        onChange={handleChange}
-        placeholder="Trainer SSN"
-        required
-      />
+        <input
+          type="text"
+          name="Fname"
+          value={formData.Fname}
+          onChange={handleChange}
+          placeholder="First Name"
+          required
+        />
 
-      <input
-        type="text"
-        name="Fname"
-        value={formData.Fname}
-        onChange={handleChange}
-        placeholder="First Name"
-        required
-      />
+        <input
+          type="text"
+          name="Lname"
+          value={formData.Lname}
+          onChange={handleChange}
+          placeholder="Last Name"
+          required
+        />
 
-      <input
-        type="text"
-        name="Lname"
-        value={formData.Lname}
-        onChange={handleChange}
-        placeholder="Last Name"
-        required
-      />
-
-      <input
-        type="number"
-        name="GymID"
-        value={formData.GymID}
-        onChange={handleChange}
-        placeholder="Gym ID"
-        required
-      />
+        <input
+          type="number"
+          name="GymID"
+          value={formData.GymID}
+          onChange={handleChange}
+          placeholder="Gym ID"
+          required
+        />
+      </div>
 
       <br />
-      <button type="submit">Save</button>
-      <button type="button" onClick={onCancel}>
-        Cancel
-      </button>
-      {onDelete && (
-        <button type="button" onClick={onDelete}>
-          Delete
+      <div className="btns">
+        <button type="submit">Save</button>
+        <button type="button" onClick={onCancel}>
+          Cancel
         </button>
-      )}
+        {onDelete && (
+          <button type="button" onClick={onDelete}>
+            Delete
+          </button>
+        )}
+      </div>
     </form>
   );
 };

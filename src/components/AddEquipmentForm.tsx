@@ -1,5 +1,6 @@
 // AddEquipmentForm.tsx
 import React, { useState, useEffect } from "react";
+import "../index.css";
 
 interface Equipment {
   EquipmentID: string;
@@ -114,15 +115,17 @@ const AddEquipmentForm: React.FC<AddEquipmentFormProps> = ({
       />
 
       <br />
-      <button type="submit">Save</button>
-      <button type="button" onClick={onCancel}>
-        Cancel
-      </button>
-      {onDelete && (
-        <button type="button" onClick={onDelete}>
-          Delete
+      <div className="btns">
+        <button type="submit">Save</button>
+        <button type="button" onClick={onCancel}>
+          Cancel
         </button>
-      )}
+        {onDelete && (
+          <button type="button" onClick={onDelete}>
+            Delete
+          </button>
+        )}
+      </div>
     </form>
   );
 };
