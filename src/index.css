@@ -103,6 +103,7 @@ h1 {
 
 .table {
   margin: 0 auto;
+  background-color: rgb(18, 22, 37, 0.5);
 }
 
 .input_bar {
@@ -120,4 +121,8 @@ h1 {
   margin-top: 20px;
   margin-left: 20px;
   margin-bottom: 20px;
+}
+
+.highlight {
+  background-color: rgb(18, 22, 37, 0.3);
 }

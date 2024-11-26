@@ -174,7 +174,7 @@ const Members: React.FC = () => {
         {loading ? (
           <p>Loading members...</p>
         ) : (
-          <table>
+          <table className="table">
             <thead>
               <tr>
                 <th>MemID</th>
@@ -185,7 +185,7 @@ const Members: React.FC = () => {
                 <th>Cell</th>
                 <th>Join Date</th>
                 <th>Status</th>
-                <th>Fitness Goal</th>
+                {/* <th>Fitness Goal</th>
                 <th>Locker ID</th>
                 <th>Gym ID</th>
                 <th>Membership ID</th>
@@ -195,7 +195,7 @@ const Members: React.FC = () => {
                 <th>State</th>
                 <th>Zipcode</th>
                 <th>Emergency Contact Name</th>
-                <th>Emergency Contact Phone</th>
+                <th>Emergency Contact Phone</th> */}
                 <th>Actions</th>
               </tr>
             </thead>
@@ -210,7 +210,7 @@ const Members: React.FC = () => {
                   <td>{member.Cell}</td>
                   <td>{member.JoinDate}</td>
                   <td>{member.Status}</td>
-                  <td>{member.FitnessGoal}</td>
+                  {/* <td>{member.FitnessGoal}</td>
                   <td>{member.LockerID}</td>
                   <td>{member.GymID}</td>
                   <td>{member.MembershipID}</td>
@@ -220,7 +220,7 @@ const Members: React.FC = () => {
                   <td>{member.State}</td>
                   <td>{member.Zipcode}</td>
                   <td>{member.ERContactName}</td>
-                  <td>{member.ERContactPhone}</td>
+                  <td>{member.ERContactPhone}</td> */}
                   <td>
                     <button onClick={() => handleEditMember(member)}>
                       Edit

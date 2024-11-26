@@ -137,7 +137,7 @@ const EquipmentPage: React.FC = () => {
       </header>
 
       <main>
-        <h1>Equipment List</h1>
+        <h1 className="highlight">Equipment List</h1>
         <div>
           {!showForm && (
             <input

@@ -73,3 +73,23 @@ button:hover {
   background-color: #333; /* Optional: Give the navbar a background color */
   padding: 10px 20px;
 }
+
+/* #bgi {
+  background-image: url("components/pics/gym.jpg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.5;
+  width: 100%;
+  background-position: center;
+  height: 100vh;
+} */
+
+body {
+  background-image: url("components/pics/gym.jpg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.8;
+  width: 100%;
+  background-position: center;
+  height: 100vh;
+}

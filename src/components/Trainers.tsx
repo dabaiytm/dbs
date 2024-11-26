@@ -131,7 +131,7 @@ const TrainerPage: React.FC = () => {
       </header>
 
       <main>
-        <h1>Trainers List</h1>
+        <h1 className="highlight">Trainers List</h1>
         <div>
           {!showForm && (
             <input

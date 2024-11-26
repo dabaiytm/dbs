@@ -130,7 +130,7 @@ const ClassesPage: React.FC = () => {
       </header>
 
       <main>
-        <h1>Classes List</h1>
+        <h1 className="highlight">Classes List</h1>
         <div>
           {!showForm && (
             <input

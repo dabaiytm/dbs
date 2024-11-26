@@ -5,35 +5,22 @@ import "./login.css";
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    // Logic to log out (e.g., clear tokens, redirect)
-    navigate("/");
-  };
-
-  const handleExit = () => {
-    const confirmExit = window.confirm("Are you sure you want to exit?");
-    if (confirmExit) {
-      window.close(); // This will close the window if it's allowed
-    }
-  };
-
   return (
     <div>
       <header>
         <nav className="navbar">
-          <button onClick={() => navigate("/Members")}>Members</button>
+          <button onClick={() => navigate("/members")}>Members</button>
           <button onClick={() => navigate("/staffs")}>Staffs</button>
           <button onClick={() => navigate("/equipment")}>Equipment</button>
           <button onClick={() => navigate("/classes")}>Classes</button>
-          <button onClick={() => navigate("/retail-sales")}>
-            Retail Sales
-          </button>
+          <button onClick={() => navigate("/retailsales")}>Retail Sales</button>
           <button onClick={() => navigate("/trainers")}>Trainers</button>
-          <button onClick={handleLogout}>Log Out</button>
-          <button onClick={handleExit}>Exit</button>
+          <button onClick={() => navigate("/feedback")}>Feedback</button>
+          <button onClick={() => navigate("/")}>Log Out</button>
         </nav>
       </header>
-      <main>{/* Content for the main page goes here */}</main>
+
+      <div id="bgi"></div>
       <p id="greeting">Welcome To The Gym Database !</p>
     </div>
   );
