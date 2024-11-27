@@ -148,7 +148,7 @@ const FeedbackPage: React.FC = () => {
       </header>
 
       <main>
-        <h1 className="highlight">Feedback List</h1>
+        <h1 className="title">Feedback List</h1>
         <div>
           {!showForm && (
             <input

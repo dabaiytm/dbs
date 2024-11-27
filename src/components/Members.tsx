@@ -139,7 +139,7 @@ const Members: React.FC = () => {
       </header>
 
       <main>
-        <h1>Members List</h1>
+        <h1 className="title">Members List</h1>
         <div>
           {!showForm && ( // Hide the search bar when the form is displayed
             <input

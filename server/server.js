@@ -8,8 +8,8 @@ import mysql from "mysql2";
 // Local MySQL Connection Pool
 const pool = mysql.createPool({
   host: 'localhost',          // Use '127.0.0.1' if 'localhost' doesn’t work
-  user: 'user', // Update with your local MySQL username
-  password: 'user', // Update with your local MySQL password
+  user: 'root', // Update with your local MySQL username
+  password: 'yaotianming', // Update with your local MySQL password
   database: 'gym_management', // Update with your local database name
   port: 3306,                 // Default MySQL port
 });

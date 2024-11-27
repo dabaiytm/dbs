@@ -8,8 +8,10 @@
 }
 
 #title {
-  font-family: "Raleway Dots", cursive;
-  font-size: 5rem; /* Increased font size */
+  font-family: Arial, Helvetica, sans-serif; 
+  text-shadow: 2px 2px 5px rgba(17, 15, 15, 0.8); 
+  font-size: 5rem; 
+  margin: 200px;
   margin-bottom: 1rem;
   color: white;
 }
@@ -21,7 +23,8 @@
 }
 
 label {
-  font-size: 1.3rem; /* Larger font for labels */
+  font-size: 1.3rem; 
+  text-shadow: 2px 2px 5px rgba(17, 15, 15, 0.8); 
   color: white;
   margin-right: 10px;
 }
@@ -60,36 +63,28 @@ button:hover {
   font-size: 1.5rem; /* Make error messages larger */
 }
 
+
 .navbar {
-  font-family: "Marker Felt", fantasy, sans-serif;
-  position: fixed; /* Fix the navbar at the top */
+  position: fixed; 
   top: 0;
   left: 0;
-  right: 0;
-  z-index: 1000; /* Make sure it's above other content */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #333; /* Optional: Give the navbar a background color */
-  padding: 10px 20px;
+  width: 100%; 
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1000; 
+  padding: 20px 0;
 }
 
-/* #bgi {
-  background-image: url("components/pics/gym.jpg");
-  background-repeat: no-repeat;
-  background-size: contain;
-  opacity: 0.5;
-  width: 100%;
-  background-position: center;
-  height: 100vh;
-} */
+.navbar button {
+  margin: 0 10px;
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
 
-body {
-  background-image: url("components/pics/gym.jpg");
-  background-repeat: no-repeat;
-  background-size: contain;
-  opacity: 0.8;
-  width: 100%;
-  background-position: center;
-  height: 100vh;
+.navbar button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }

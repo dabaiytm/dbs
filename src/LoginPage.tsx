@@ -53,7 +53,7 @@ const LoginPage: React.FC = () => {
   return (
     <div className="App">
       <header className="App-header">
-        <h1 id="title">Gym User Login</h1>
+        <h1 id="title">Gym Admin Login</h1>
         <form onSubmit={handleLogin} className="login-form">
           {error && <p className="error">{error}</p>}
           <div>

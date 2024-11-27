@@ -139,7 +139,7 @@ const RetailSalePage: React.FC = () => {
       </header>
 
       <main>
-        <h1 className="highlight">Retail Sales</h1>
+        <h1 className="title">Retail Sales</h1>
         <div>
           {!showForm && (
             <input

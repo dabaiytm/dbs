@@ -127,7 +127,7 @@ const Staffs: React.FC = () => {
       </header>
 
       <main>
-        <h1 className="highlight">Staff List</h1>
+        <h1 className="title">Staff List</h1>
         <div>
           {!showForm && ( // Hide the search bar when the form is displayed
             <input
